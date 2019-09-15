@@ -24,7 +24,8 @@ public class Main {
     Window window = new Window(800, 600, "A window name.");
     GLFW.glfwMakeContextCurrent(window.get());
     GL.createCapabilities();
-    
+    System.out.println(123);
+
     GL33.glEnable(GL33.GL_DEPTH_TEST);
     
     // Enable v-sync.
@@ -60,7 +61,7 @@ public class Main {
     while (!GLFW.glfwWindowShouldClose(window.get())) {
       
       if (KeyboardInputHandler.KEYS['W']) {
-        
+
       }
       
       // Clear frame buffers.
