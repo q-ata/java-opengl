@@ -3,7 +3,7 @@ import org.lwjgl.glfw.GLFWKeyCallbackI;
 
 public class KeyboardInputHandler implements GLFWKeyCallbackI {
 
-  public static final boolean[] KEYS = new boolean[255];
+  public static final boolean[] KEYS = new boolean[512];
   
   @Override
   public void invoke(long window, int key, int scancode, int action, int mods) {

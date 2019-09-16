@@ -1,8 +1,8 @@
 
-public class DonaldTrump extends MapItem {
+public class DonaldTrump extends Renderable {
 
   public DonaldTrump() {
-    super(Figure.CUBE, Sprite.TRUMP);
+    super(Figure.CUBE, Transformation.TRUMP, Sprite.TRUMP);
   }
   
 }

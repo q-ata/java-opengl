@@ -2,23 +2,18 @@ import java.nio.IntBuffer;
 
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
+import org.joml.Vector4f;
 import org.lwjgl.opengl.GL33;
 
 public abstract class MapItem {
   
   private Figure shape;
-  private Sprite sprite;
-  private Matrix4f pos = new Matrix4f();
+  private Vector3f pos = new Vector3f();
+  private Matrix4f model;
   
-  public MapItem(Figure shape, Sprite sprite) {
+  public MapItem(Figure shape, Transformation transform) {
     this.shape = shape;
-    this.sprite = sprite;
-    pos.rotate((float) Math.toRadians(45), new Vector3f(1.0f, 0.0f, 0.0f));
-  }
-  
-  public void bind() {
-    GL33.glActiveTexture(GL33.GL_TEXTURE0);
-    GL33.glBindTexture(GL33.GL_TEXTURE0, sprite.get());
+    model = transform.get();
   }
   
   public float[] getVertices() {
@@ -29,8 +24,16 @@ public abstract class MapItem {
     return shape.getIndices();
   }
   
-  public Matrix4f pos() {
+  public Vector3f pos() {
     return pos;
+  }
+
+  public void addPos(Vector3f pos) {
+    this.pos.add(pos);
+  }
+
+  public Matrix4f model() {
+    return model;
   }
 
 }

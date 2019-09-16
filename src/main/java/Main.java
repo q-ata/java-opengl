@@ -1,4 +1,5 @@
 import org.joml.Matrix4f;
+import org.joml.Vector2f;
 import org.joml.Vector3f;
 import org.lwjgl.glfw.Callbacks;
 import org.lwjgl.glfw.GLFW;
@@ -24,7 +25,6 @@ public class Main {
     Window window = new Window(800, 600, "A window name.");
     GLFW.glfwMakeContextCurrent(window.get());
     GL.createCapabilities();
-    System.out.println(123);
 
     GL33.glEnable(GL33.GL_DEPTH_TEST);
     
@@ -49,19 +49,38 @@ public class Main {
     GL33.glEnableVertexAttribArray(1);
     GL33.glBindVertexArray(0);
     
-    int err = GL33.GL_NO_ERROR;
+    int err;
     while((err = GL33.glGetError()) != GL33.GL_NO_ERROR) {
       System.out.println(err);
     }
-    
+
+    Camera camera = new Camera();
+
     GLFW.glfwSetKeyCallback(window.get(), new KeyboardInputHandler());
+    GLFW.glfwSetCursorPosCallback(window.get(), new MouseMovementHandler(camera));
+    GLFW.glfwSetInputMode(window.get(), GLFW.GLFW_CURSOR, GLFW.GLFW_CURSOR_DISABLED);
+
+    Matrix4f mvp;
+    Matrix4f proj = new Matrix4f().perspective((float) Math.toRadians(45.0f), (float) window.getWidth() / window.getHeight(), 0.1f, 100.00f);
 
     // Background clear color.
     window.setClearColor(0.0f, 1.0f, 0.0f, 0.0f);
     while (!GLFW.glfwWindowShouldClose(window.get())) {
-      
-      if (KeyboardInputHandler.KEYS['W']) {
 
+      if (KeyboardInputHandler.KEYS[256]) {
+        GLFW.glfwSetWindowShouldClose(window.get(), true);
+      }
+      if (KeyboardInputHandler.KEYS['W']) {
+        camera.addPos(new Vector3f(0.0f, 0.0f, -0.02f));
+      }
+      if (KeyboardInputHandler.KEYS['A']) {
+        camera.addPos(new Vector3f(-0.02f, 0.0f, 0.0f));
+      }
+      if (KeyboardInputHandler.KEYS['S']) {
+        camera.addPos(new Vector3f(0.0f, 0.0f, 0.02f));
+      }
+      if (KeyboardInputHandler.KEYS['D']) {
+        camera.addPos(new Vector3f(0.02f, 0.0f, 0.0f));
       }
       
       // Clear frame buffers.
@@ -70,10 +89,10 @@ public class Main {
       shader.use();
       trump.bind();
       GL33.glBindVertexArray(vao);
-      Matrix4f model = trump.pos();
-      Matrix4f view = new Matrix4f().lookAt(new Vector3f(0.0f, 0.0f, 2.0f), new Vector3f(0.0f, 0.0f, 0.0f), new Vector3f(0.0f, 1.0f, 0.0f));
-      Matrix4f proj = new Matrix4f().perspective((float) Math.toRadians(45.0f), (float) window.getWidth() / window.getHeight(), 0.1f, 100.00f);
-      Matrix4f mvp = proj.mul(view).mul(model);
+
+      mvp = new Matrix4f();
+      proj.mul(camera.constructView(), mvp);
+      mvp.mul(trump.model());
       shader.setUniformMatrix("mvp", mvp);
       GL33.glDrawElements(GL33.GL_TRIANGLES, trump.getIndices());
 
