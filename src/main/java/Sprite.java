@@ -11,9 +11,8 @@ public enum Sprite {
   
   TRUMP("./res/trump.png"),
   CAMERA(""),
-  WALL("./res/wall.png"),
-  FONT("./res/font.png");
-  
+  WALL("./res/wall.png");
+
   private final int handle;
   
   private Sprite(String source) {
