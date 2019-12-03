@@ -1,11 +1,11 @@
 import org.joml.Matrix4f;
-import org.joml.Vector2f;
 import org.joml.Vector3f;
 import org.lwjgl.glfw.Callbacks;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.opengl.GL;
 import org.lwjgl.opengl.GL33;
+import org.lwjgl.opengl.GLCapabilities;
 
 public class Main {
 
@@ -24,31 +24,35 @@ public class Main {
     // Create a new window.
     Window window = new Window(800, 600, "A window name.");
     GLFW.glfwMakeContextCurrent(window.get());
-    GL.createCapabilities();
+    GLCapabilities capabilities = GL.createCapabilities();
+    if (!capabilities.OpenGL33) {
+      Logger.error(getClass(), "OpenGL version 3.3 is not supported.");
+      return;
+    }
 
     GL33.glEnable(GL33.GL_DEPTH_TEST);
     
     // Enable v-sync.
-    GLFW.glfwSwapInterval(1);
+    // GLFW.glfwSwapInterval(1);
     // Show the window.
     GLFW.glfwShowWindow(window.get());
 
     Shader shader = new Shader("./res/basic_shader.vs", "./res/basic_shader.fs");
     shader.use();
     GL33.glUniform1i(GL33.glGetUniformLocation(shader.get(), "texData"), 0);
-    DonaldTrump trump = new DonaldTrump();
-    int vao = GL33.glGenVertexArrays();
-    GL33.glBindVertexArray(vao);
-    int vbo = GL33.glGenBuffers();
-    GL33.glBindBuffer(GL33.GL_ARRAY_BUFFER, vbo);
 
-    GL33.glBufferData(GL33.GL_ARRAY_BUFFER, trump.getVertices(), GL33.GL_STATIC_DRAW);
-    GL33.glVertexAttribPointer(0, 3, GL33.GL_FLOAT, false, 20, 0);
-    GL33.glEnableVertexAttribArray(0);
-    GL33.glVertexAttribPointer(1, 2, GL33.GL_FLOAT, false, 20, 12);
-    GL33.glEnableVertexAttribArray(1);
-    GL33.glBindVertexArray(0);
-    
+    Game game = Game.INSTANCE;
+    DonaldTrump trump = new DonaldTrump();
+    Game.INSTANCE.addItem(trump);
+    Game.INSTANCE.addInstance(new Vector3f(0.0f, 0.0f, 0.0f), trump.id());
+    Game.INSTANCE.addInstance(new Vector3f(1.5f, 0.0f, 0.0f), trump.id());
+    trump.setVao(Game.INSTANCE.genBinding(trump));
+    /*
+    Wall wall = new Wall();
+    wall.addInstance(new WallInstance(new Vector3f(0.5f, 0.0f, 0.0f)));
+    game.getItems().add(wall);
+    wall.setVao(game.genBinding(wall));
+    */
     int err;
     while((err = GL33.glGetError()) != GL33.GL_NO_ERROR) {
       System.out.println(err);
@@ -56,13 +60,21 @@ public class Main {
 
     Camera camera = new Camera();
 
-    GLFW.glfwSetKeyCallback(window.get(), new KeyboardInputHandler());
+    KeyboardInputHandler keyHandler = new KeyboardInputHandler();
+    GLFW.glfwSetKeyCallback(window.get(), keyHandler);
+    PlayerMovementHandler moveHandler = new PlayerMovementHandler(keyHandler);
     GLFW.glfwSetCursorPosCallback(window.get(), new MouseMovementHandler(camera));
     GLFW.glfwSetInputMode(window.get(), GLFW.GLFW_CURSOR, GLFW.GLFW_CURSOR_DISABLED);
 
-    Matrix4f mvp;
-    Matrix4f proj = new Matrix4f().perspective((float) Math.toRadians(45.0f), (float) window.getWidth() / window.getHeight(), 0.1f, 100.00f);
+    Matrix4f mvp = new Matrix4f();
+    // TODO: Adjust projection matrix when window is resized.
+    Matrix4f proj = new Matrix4f().perspective((float) Math.toRadians(50.0f), (float) window.getWidth() / window.getHeight(), 0.1f, 100.0f);
 
+    int frames = 0;
+    long delta = System.currentTimeMillis();
+    long current;
+    long prevTime = System.currentTimeMillis();
+    long curTime;
     // Background clear color.
     window.setClearColor(0.0f, 1.0f, 0.0f, 0.0f);
     while (!GLFW.glfwWindowShouldClose(window.get())) {
@@ -70,32 +82,45 @@ public class Main {
       if (KeyboardInputHandler.KEYS[256]) {
         GLFW.glfwSetWindowShouldClose(window.get(), true);
       }
-      if (KeyboardInputHandler.KEYS['W']) {
-        camera.addPos(new Vector3f(0.0f, 0.0f, -0.02f));
+
+      curTime = System.currentTimeMillis();
+      Vector3f v = moveHandler.calculateVelocity(camera.target(), 0.003f * (curTime - prevTime));
+      camera.addPos(v);
+      prevTime = curTime;
+
+      for (int i = 0; i < game.getAll().size(); i++) {
+        for (int j = i + 1; j < game.getAll().size(); j++) {
+          MapItemInstance a = game.getAll().get(i);
+          MapItemInstance b = game.getAll().get(j);
+          System.out.println(Collision.collision(a.world(), game.retrieve(a), b.world(), game.retrieve(b)));
+        }
       }
-      if (KeyboardInputHandler.KEYS['A']) {
-        camera.addPos(new Vector3f(-0.02f, 0.0f, 0.0f));
-      }
-      if (KeyboardInputHandler.KEYS['S']) {
-        camera.addPos(new Vector3f(0.0f, 0.0f, 0.02f));
-      }
-      if (KeyboardInputHandler.KEYS['D']) {
-        camera.addPos(new Vector3f(0.02f, 0.0f, 0.0f));
-      }
-      
+      game.getInstances(trump.id()).get(0).move(new Vector3f(0.0002f, 0f, 0f));
+
       // Clear frame buffers.
       window.clear();
 
-      shader.use();
-      trump.bind();
-      GL33.glBindVertexArray(vao);
-
-      mvp = new Matrix4f();
+      mvp.identity();
       proj.mul(camera.constructView(), mvp);
-      mvp.mul(trump.model());
-      shader.setUniformMatrix("mvp", mvp);
-      GL33.glDrawElements(GL33.GL_TRIANGLES, trump.getIndices());
 
+      for (MapItem item : game.getItems()) {
+        item.bind();
+        GL33.glBindVertexArray(item.vao());
+        for (MapItemInstance instance : game.getInstances(item.id())) {
+          Matrix4f instanceMat = new Matrix4f();
+          mvp.mul(item.model(), instanceMat);
+          instanceMat.translate(instance.world());
+          shader.setUniformMatrix("mvp", instanceMat);
+          GL33.glDrawElements(GL33.GL_TRIANGLES, item.getIndices().length, GL33.GL_UNSIGNED_INT, 0);
+        }
+      }
+
+      frames++;
+      if ((current = System.currentTimeMillis()) >= delta + 1000) {
+        System.out.println(frames + " FPS");
+        frames = 0;
+        delta = current;
+      }
       // Swap to other frame buffer.
       GLFW.glfwSwapBuffers(window.get());
       // Poll for window events and run callbacks.
@@ -106,7 +131,14 @@ public class Main {
     GLFW.glfwDestroyWindow(window.get());
 
     GLFW.glfwTerminate();
-    GLFW.glfwSetErrorCallback(null).free();
+
+    GLFWErrorCallback cb = GLFW.glfwSetErrorCallback(null);
+    if (cb != null) {
+      cb.free();
+    }
+    else {
+      Logger.error(getClass(), "Could not free error callback buffer.");
+    }
   }
 
   public static void main(String[] args) {

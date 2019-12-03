@@ -4,18 +4,27 @@ import java.nio.IntBuffer;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL33;
 import org.lwjgl.stb.STBImage;
+import org.lwjgl.system.MemoryStack;
+import org.lwjgl.system.MemoryUtil;
 
 public enum Sprite {
   
-  TRUMP("./res/trump.png");
+  TRUMP("./res/trump.png"),
+  CAMERA(""),
+  WALL("./res/wall.png"),
+  FONT("./res/font.png");
   
   private final int handle;
   
   private Sprite(String source) {
+    if (source.equals("")) {
+      handle = 0;
+      return;
+    }
     STBImage.stbi_set_flip_vertically_on_load(true);
-    IntBuffer width = BufferUtils.createIntBuffer(1);
-    IntBuffer height = BufferUtils.createIntBuffer(1);
-    IntBuffer channels = BufferUtils.createIntBuffer(1);
+    IntBuffer width = MemoryUtil.memAllocInt(1);
+    IntBuffer height = MemoryUtil.memAllocInt(1);
+    IntBuffer channels = MemoryUtil.memAllocInt(1);
     ByteBuffer data = STBImage.stbi_load(source, width, height, channels, 0);
     if (data == null) {
       Logger.error(getClass(), "Failed to load texture source: " + source);
@@ -35,8 +44,11 @@ public enum Sprite {
     GL33.glTexImage2D(GL33.GL_TEXTURE_2D, 0, colorScheme, width.get(), height.get(), 0, colorScheme, GL33.GL_UNSIGNED_BYTE, data);
     // Generate mipmaps for bound texture.
     GL33.glGenerateMipmap(GL33.GL_TEXTURE_2D);
-    
+    GL33.glBindTexture(GL33.GL_TEXTURE_2D, 0);
     STBImage.stbi_image_free(data);
+    MemoryUtil.memFree(width);
+    MemoryUtil.memFree(height);
+    MemoryUtil.memFree(channels);
   }
   
   public int get() {

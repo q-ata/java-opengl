@@ -3,7 +3,10 @@ import org.joml.Vector3f;
 
 public class Camera extends MapItem {
 
-  private static final Vector3f UP = new Vector3f(0.0f, 1.0f, 0.0f);
+  public static final Vector3f UP = new Vector3f(0.0f, 1.0f, 0.0f);
+
+  private Vector3f target = new Vector3f();
+  private Vector3f pos = new Vector3f();
 
   private float pitch = 0.0f;
   private float yaw = -90.0f;
@@ -14,15 +17,16 @@ public class Camera extends MapItem {
   private float sensitivity = 0.05f;
 
   public Camera() {
-    super(Figure.CUBE, Transformation.IDENTITY);
+    super(Figure.CUBE, Transformation.IDENTITY, Sprite.CAMERA, DonaldTrumpInstance.class);
   }
 
   public Matrix4f constructView() {
-    Vector3f target = new Vector3f();
     target.setComponent(0, (float) Math.cos(Math.toRadians(pitch)) * (float) Math.cos(Math.toRadians(yaw)));
     target.setComponent(1, (float) Math.sin(Math.toRadians(pitch)));
     target.setComponent(2, (float) Math.cos(Math.toRadians(pitch)) * (float) Math.sin(Math.toRadians(yaw)));
-    return new Matrix4f().lookAt(pos(), target.add(pos()), UP);
+    Vector3f result = new Vector3f();
+    target.add(pos(), result);
+    return new Matrix4f().lookAt(pos(), result, UP);
   }
 
   public void processMouseMovement(double newX, double newY) {
@@ -45,6 +49,18 @@ public class Camera extends MapItem {
     }
     prevX = (float) newX;
     prevY = (float) newY;
+  }
+
+  public Vector3f target() {
+    return target;
+  }
+
+  public void addPos(Vector3f pos) {
+    this.pos.add(pos);
+  }
+
+  public Vector3f pos() {
+    return pos;
   }
 
 }

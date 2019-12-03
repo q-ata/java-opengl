@@ -1,1 +1,1 @@
-Hi
+A first person shooter game made with LWJGL.

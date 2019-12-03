@@ -3,7 +3,7 @@ import org.joml.Vector3f;
 
 public enum Transformation {
 
-  TRUMP(new Matrix4f().rotate((float) Math.toRadians(45), new Vector3f(1.0f, 0.0f, 0.0f))),
+  TRUMP(new Matrix4f()),
   IDENTITY(new Matrix4f());
 
   private final Matrix4f transform;

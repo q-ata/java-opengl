@@ -71,19 +71,18 @@ public enum Figure {
   });
   
   private final float[] vertices;
-  private final IntBuffer indices;
+  private final int[] indices;
   
   private Figure(float[] vertices, int[] indices) {
     this.vertices = vertices;
-    this.indices = BufferUtils.createIntBuffer(indices.length);
-    this.indices.put(indices).flip();
+    this.indices = indices;
   }
   
   public float[] getVertices() {
     return vertices;
   }
   
-  public IntBuffer getIndices() {
+  public int[] getIndices() {
     return indices;
   }
   
