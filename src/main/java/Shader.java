@@ -5,6 +5,9 @@ import java.io.IOException;
 import java.nio.FloatBuffer;
 
 import org.joml.Matrix4f;
+import org.joml.Vector2f;
+import org.joml.Vector3f;
+import org.joml.Vector4f;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL33;
 
@@ -12,6 +15,8 @@ import org.lwjgl.opengl.GL33;
  * Represents a shader program with a vertex and fragment shader.
  */
 public class Shader extends Handle {
+
+  private static int currentHandle = -1;
   
   /**
    * Construct a shader program.
@@ -61,13 +66,33 @@ public class Shader extends Handle {
    * Bind this shader for use.
    */
   public void use() {
-    GL33.glUseProgram(handle);
+    if (currentHandle != handle) {
+      GL33.glUseProgram(handle);
+    }
   }
   
   public void setUniformMatrix(String name, Matrix4f mat) {
     FloatBuffer fb = BufferUtils.createFloatBuffer(16);
     mat.get(fb);
     GL33.glUniformMatrix4fv(GL33.glGetUniformLocation(handle, name), false, fb);
+  }
+
+  public void setUniformVec4(String name, Vector4f vec) {
+    FloatBuffer fb = BufferUtils.createFloatBuffer(4);
+    vec.get(fb);
+    GL33.glUniform4fv(GL33.glGetUniformLocation(handle, name), fb);
+  }
+
+  public void setUniformVec3(String name, Vector3f vec) {
+    FloatBuffer fb = BufferUtils.createFloatBuffer(3);
+    vec.get(fb);
+    GL33.glUniform4fv(GL33.glGetUniformLocation(handle, name), fb);
+  }
+
+  public void setUniformVec2(String name, Vector2f vec) {
+    FloatBuffer fb = BufferUtils.createFloatBuffer(2);
+    vec.get(fb);
+    GL33.glUniform4fv(GL33.glGetUniformLocation(handle, name), fb);
   }
   
   /**

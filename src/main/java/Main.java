@@ -37,9 +37,7 @@ public class Main {
     // Show the window.
     GLFW.glfwShowWindow(window.get());
 
-    Shader shader = new Shader("./res/basic_shader.vs", "./res/basic_shader.fs");
-    shader.use();
-    GL33.glUniform1i(GL33.glGetUniformLocation(shader.get(), "texData"), 0);
+    GL33.glUniform1i(GL33.glGetUniformLocation(Shaders.RENDERER.get(), "texData"), 0);
 
     Game game = Game.INSTANCE;
     DonaldTrump trump = new DonaldTrump();
@@ -103,6 +101,7 @@ public class Main {
       mvp.identity();
       proj.mul(camera.constructView(), mvp);
 
+      Shaders.RENDERER.use();
       for (MapItem item : game.getItems()) {
         item.bind();
         GL33.glBindVertexArray(item.vao());
@@ -110,7 +109,7 @@ public class Main {
           Matrix4f instanceMat = new Matrix4f();
           mvp.mul(item.model(), instanceMat);
           instanceMat.translate(instance.world());
-          shader.setUniformMatrix("mvp", instanceMat);
+          Shaders.RENDERER.setUniformMatrix("mvp", instanceMat);
           GL33.glDrawElements(GL33.GL_TRIANGLES, item.getIndices().length, GL33.GL_UNSIGNED_INT, 0);
         }
       }
