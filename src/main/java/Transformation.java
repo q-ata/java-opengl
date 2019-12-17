@@ -4,6 +4,7 @@ import org.joml.Vector3f;
 public enum Transformation {
 
   TRUMP(new Matrix4f()),
+  CAMERA(new Matrix4f().scale(new Vector3f(0.5f, 1.0f, 0.5f))),
   IDENTITY(new Matrix4f());
 
   private final Matrix4f transform;

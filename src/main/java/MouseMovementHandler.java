@@ -2,9 +2,9 @@ import org.lwjgl.glfw.GLFWCursorPosCallbackI;
 
 public class MouseMovementHandler implements GLFWCursorPosCallbackI {
 
-  private Camera camera;
+  private CameraInstance camera;
 
-  public MouseMovementHandler(Camera camera) {
+  public MouseMovementHandler(CameraInstance camera) {
     this.camera = camera;
   }
 

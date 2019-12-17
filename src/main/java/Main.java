@@ -41,10 +41,14 @@ public class Main {
 
     Game game = Game.INSTANCE;
     DonaldTrump trump = new DonaldTrump();
+    Camera cam = new Camera();
     Game.INSTANCE.addItem(trump);
-    Game.INSTANCE.addInstance(new Vector3f(0.0f, 0.0f, 0.0f), trump.id());
-    Game.INSTANCE.addInstance(new Vector3f(1.5f, 0.0f, 0.0f), trump.id());
+    Game.INSTANCE.addInstance(new Vector3f(-8.0f, 0.0f, 0.0f), trump.id());
+    Game.INSTANCE.addInstance(new Vector3f(4f, 0.0f, 0.0f), trump.id());
     trump.setVao(Game.INSTANCE.genBinding(trump));
+    Game.INSTANCE.addItem(cam);
+    Game.INSTANCE.addInstance(new Vector3f(4f, 0.0f, 2.0f), cam.id());
+    CameraInstance camera = (CameraInstance) Game.INSTANCE.getInstances(cam.id()).get(0);
     /*
     Wall wall = new Wall();
     wall.addInstance(new WallInstance(new Vector3f(0.5f, 0.0f, 0.0f)));
@@ -55,8 +59,6 @@ public class Main {
     while((err = GL33.glGetError()) != GL33.GL_NO_ERROR) {
       System.out.println(err);
     }
-
-    Camera camera = new Camera();
 
     KeyboardInputHandler keyHandler = new KeyboardInputHandler();
     GLFW.glfwSetKeyCallback(window.get(), keyHandler);
@@ -83,14 +85,16 @@ public class Main {
 
       curTime = System.currentTimeMillis();
       Vector3f v = moveHandler.calculateVelocity(camera.target(), 0.003f * (curTime - prevTime));
-      camera.addPos(v);
+      camera.move(v);
       prevTime = curTime;
 
       for (int i = 0; i < game.getAll().size(); i++) {
         for (int j = i + 1; j < game.getAll().size(); j++) {
           MapItemInstance a = game.getAll().get(i);
           MapItemInstance b = game.getAll().get(j);
-          System.out.println(Collision.collision(a.world(), game.retrieve(a), b.world(), game.retrieve(b)));
+          if (Collision.collision(a.world(), game.retrieve(a), b.world(), game.retrieve(b))) {
+            System.out.println("yes");
+          }
         }
       }
       game.getInstances(trump.id()).get(0).move(new Vector3f(0.0002f, 0f, 0f));

@@ -76,7 +76,7 @@ public class PlayerMovementHandler {
       }
     }
     if (right != 0) {
-      rl.add(target.cross(Camera.UP));
+      rl.add(target.cross(CameraInstance.UP));
       if (right == LEFT) {
         rl.negate();
       }
