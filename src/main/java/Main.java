@@ -85,19 +85,29 @@ public class Main {
 
       curTime = System.currentTimeMillis();
       Vector3f v = moveHandler.calculateVelocity(camera.target(), 0.003f * (curTime - prevTime));
-      camera.move(v);
+      camera.setVel(v.add(0, camera.vel().y, 0));
       prevTime = curTime;
 
+      //game.getInstances(trump.id()).get(0).setVel(new Vector3f(0.0002f, 0f, 0f));
+      for (MapItemInstance instance : game.getAll()) {
+        instance.onTick();
+      }
       for (int i = 0; i < game.getAll().size(); i++) {
         for (int j = i + 1; j < game.getAll().size(); j++) {
           MapItemInstance a = game.getAll().get(i);
           MapItemInstance b = game.getAll().get(j);
           if (Collision.collision(a.world(), game.retrieve(a), b.world(), game.retrieve(b))) {
-            System.out.println("yes");
+            a.onCollision(b);
+            b.onCollision(a);
+            a.onCollisionResolution(b);
+            b.onCollisionResolution(a);
           }
         }
       }
-      game.getInstances(trump.id()).get(0).move(new Vector3f(0.0002f, 0f, 0f));
+
+      for (MapItemInstance instance : game.getAll()) {
+        instance.onGravity();
+      }
 
       // Clear frame buffers.
       window.clear();
