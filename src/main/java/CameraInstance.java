@@ -25,7 +25,9 @@ public class CameraInstance extends MapItemInstance {
     target.setComponent(2, (float) Math.cos(Math.toRadians(pitch)) * (float) Math.sin(Math.toRadians(yaw)));
     Vector3f result = new Vector3f();
     target.add(world(), result);
-    return new Matrix4f().lookAt(world(), result, UP);
+    Vector3f heighten = world();
+    heighten.add(0f, 0.5f, 0f);
+    return new Matrix4f().lookAt(heighten, result, UP);
   }
 
   public void processMouseMovement(double newX, double newY) {

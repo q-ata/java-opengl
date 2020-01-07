@@ -1,5 +1,5 @@
 public class Wall extends MapItem {
   public Wall() {
-    super(Figure.QUAD, Transformation.IDENTITY, Sprite.WALL, WallInstance.class);
+    super(Figure.CUBE, Transformation.WALL, Sprite.WALL, WallInstance.class);
   }
 }

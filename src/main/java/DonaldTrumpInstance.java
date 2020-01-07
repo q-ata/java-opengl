@@ -10,4 +10,5 @@ public class DonaldTrumpInstance extends MapItemInstance {
   public void behaviour() {
 
   }
+
 }

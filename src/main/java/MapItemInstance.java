@@ -5,7 +5,7 @@ public abstract class MapItemInstance {
   private Vector3f worldPos;
 
   private Vector3f vel = new Vector3f();
-  private static final Vector3f GRAVITY = new Vector3f(0.0f, 0.000000002f, 0.0f);
+  private static final Vector3f GRAVITY = new Vector3f(0.0f, -0.0000002f, 0.0f);
 
   public MapItemInstance(Vector3f worldPos) {
     this.worldPos = worldPos;
@@ -56,11 +56,21 @@ public abstract class MapItemInstance {
   }
 
   /**
-   * Callback for after this instance has collided with another. By default used to determine if gravity can still be applied.
+   * Callback for after this instance has collided with another. By default used to determine if any components can still be applied.
    * @param other The other instance.
    */
   public void onCollisionResolution(MapItemInstance other) {
-    Vector3f v = new Vector3f(0f, vel().y, 0f);
+    Vector3f v = new Vector3f(vel().x, 0f, 0f);
+    worldPos.add(v);
+    if (Collision.collision(world(), Game.INSTANCE.retrieve(this), other.world(), Game.INSTANCE.retrieve(other))) {
+      worldPos.add(v.negate());
+    }
+    v = new Vector3f(0f, vel().y, 0f);
+    worldPos.add(v);
+    if (Collision.collision(world(), Game.INSTANCE.retrieve(this), other.world(), Game.INSTANCE.retrieve(other))) {
+      worldPos.add(v.negate());
+    }
+    v = new Vector3f(0f, 0f, vel().z);
     worldPos.add(v);
     if (Collision.collision(world(), Game.INSTANCE.retrieve(this), other.world(), Game.INSTANCE.retrieve(other))) {
       worldPos.add(v.negate());

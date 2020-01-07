@@ -10,12 +10,12 @@ public class Collision {
     Vector3f scaleB = new Vector3f();
     typeB.model().getScale(scaleB);
     // posA and posB represent the center of the hitbox.
-    return posA.x() + scaleA.x() / 2 > posB.x() - scaleB.x() / 2 + EPSILON &&
-            posB.x() + scaleB.x() / 2 > posA.x() - scaleA.x() / 2 + EPSILON &&
-            posA.y() + scaleA.y() / 2 > posB.y() - scaleB.y() / 2 + EPSILON &&
-            posB.y() + scaleB.y() / 2 > posA.y() - scaleA.y() / 2 + EPSILON &&
-            posA.z() + scaleA.z() / 2 > posB.z() - scaleB.z() / 2 + EPSILON &&
-            posB.z() + scaleB.z() / 2 > posA.z() - scaleA.z() / 2 + EPSILON;
+    return posA.x() + scaleA.x() / 2 > posB.x() - scaleB.x() / 2 &&
+            posB.x() + scaleB.x() / 2 > posA.x() - scaleA.x() / 2 &&
+            posA.y() + scaleA.y() / 2 > posB.y() - scaleB.y() / 2 &&
+            posB.y() + scaleB.y() / 2 > posA.y() - scaleA.y() / 2 &&
+            posA.z() + scaleA.z() / 2 > posB.z() - scaleB.z() / 2 &&
+            posB.z() + scaleB.z() / 2 > posA.z() - scaleA.z() / 2;
   }
 
 }

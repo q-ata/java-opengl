@@ -48,6 +48,12 @@ public class Main {
     trump.setVao(Game.INSTANCE.genBinding(trump));
     Game.INSTANCE.addItem(cam);
     Game.INSTANCE.addInstance(new Vector3f(4f, 0.0f, 2.0f), cam.id());
+
+    Wall wall = new Wall();
+    Game.INSTANCE.addItem(wall);
+    Game.INSTANCE.addInstance(new Vector3f(1f, -1.1f, 0f), wall.id());
+    wall.setVao(Game.INSTANCE.genBinding(wall));
+
     CameraInstance camera = (CameraInstance) Game.INSTANCE.getInstances(cam.id()).get(0);
     /*
     Wall wall = new Wall();
@@ -113,17 +119,18 @@ public class Main {
       window.clear();
 
       mvp.identity();
-      proj.mul(camera.constructView(), mvp);
+      mvp.mul(proj);
+      mvp.mul(camera.constructView());
 
       Shaders.RENDERER.use();
       for (MapItem item : game.getItems()) {
         item.bind();
         GL33.glBindVertexArray(item.vao());
         for (MapItemInstance instance : game.getInstances(item.id())) {
-          Matrix4f instanceMat = new Matrix4f();
-          mvp.mul(item.model(), instanceMat);
-          instanceMat.translate(instance.world());
-          Shaders.RENDERER.setUniformMatrix("mvp", instanceMat);
+          Matrix4f insMvp = new Matrix4f(mvp);
+          Matrix4f instanceMat = new Matrix4f().translate(instance.world()).mul(item.model());
+          insMvp.mul(instanceMat);
+          Shaders.RENDERER.setUniformMatrix("mvp", insMvp);
           GL33.glDrawElements(GL33.GL_TRIANGLES, item.getIndices().length, GL33.GL_UNSIGNED_INT, 0);
         }
       }

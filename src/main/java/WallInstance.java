@@ -8,6 +8,9 @@ public class WallInstance extends MapItemInstance {
 
   @Override
   public void behaviour() {
+  }
 
+  @Override
+  public void onGravity() {
   }
 }

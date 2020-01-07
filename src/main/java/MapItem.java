@@ -65,7 +65,7 @@ public abstract class MapItem {
   }
 
   public Matrix4f model() {
-    return model;
+    return new Matrix4f(model);
   }
 
   public int vao() {
