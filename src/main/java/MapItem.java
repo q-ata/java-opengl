@@ -21,6 +21,7 @@ public abstract class MapItem {
     model = transform.get();
     this.sprite = sprite;
     this.type = type;
+    setVao(Game.INSTANCE.genBinding(this));
   }
 
   /**
@@ -72,7 +73,7 @@ public abstract class MapItem {
     return vao;
   }
 
-  public void setVao(int vao) {
+  protected void setVao(int vao) {
     if (this.vao != 0) {
       Logger.error(getClass(), "VAO already bound with ID: " + vao);
       return;

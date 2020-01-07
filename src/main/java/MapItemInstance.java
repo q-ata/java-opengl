@@ -41,6 +41,15 @@ public abstract class MapItemInstance {
   }
 
   /**
+   * Adjust the location of this instance in world space. This method accounts for the difference between frames
+   * such that a constant amount will be moved regardless of computer speed.
+   * @param amt The amount to move by.
+   */
+  public void move(Vector3f amt) {
+    worldPos.add(amt.mul(Game.INSTANCE.getAdjustment()));
+  }
+
+  /**
    * Callback for when the game ticks forward.
    */
   public void onTick() {

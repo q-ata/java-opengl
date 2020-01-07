@@ -12,6 +12,13 @@ public class Game {
   private Map<Class<? extends MapItemInstance>, Integer> mapping = new HashMap<>();
   private List<MapItemInstance> all = new ArrayList<>();
 
+  private long prevTime;
+  private long curTime;
+
+  public Game() {
+    prevTime = curTime = System.currentTimeMillis();
+  }
+
   /**
    * Create a VAO to represent all instances of the specified MapItem.
    * @param item The MapItem to generate a VAO for.
@@ -35,6 +42,22 @@ public class Game {
     GL33.glBindBuffer(GL33.GL_ARRAY_BUFFER, 0);
     GL33.glBindBuffer(GL33.GL_ELEMENT_ARRAY_BUFFER, 0);
     return vao;
+  }
+
+  /**
+   * Update timestamps.
+   */
+  public void adjust() {
+    prevTime = curTime;
+    curTime = System.currentTimeMillis();
+  }
+
+  /**
+   * Get delta between frames.
+   * @return The difference.
+   */
+  public long getAdjustment() {
+    return curTime - prevTime;
   }
 
   /**

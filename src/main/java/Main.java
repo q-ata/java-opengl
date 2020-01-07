@@ -45,14 +45,12 @@ public class Main {
     Game.INSTANCE.addItem(trump);
     Game.INSTANCE.addInstance(new Vector3f(-8.0f, 0.0f, 0.0f), trump.id());
     Game.INSTANCE.addInstance(new Vector3f(4f, 0.0f, 0.0f), trump.id());
-    trump.setVao(Game.INSTANCE.genBinding(trump));
     Game.INSTANCE.addItem(cam);
     Game.INSTANCE.addInstance(new Vector3f(4f, 0.0f, 2.0f), cam.id());
 
     Wall wall = new Wall();
     Game.INSTANCE.addItem(wall);
     Game.INSTANCE.addInstance(new Vector3f(1f, -1.1f, 0f), wall.id());
-    wall.setVao(Game.INSTANCE.genBinding(wall));
 
     CameraInstance camera = (CameraInstance) Game.INSTANCE.getInstances(cam.id()).get(0);
     /*
@@ -79,8 +77,6 @@ public class Main {
     int frames = 0;
     long delta = System.currentTimeMillis();
     long current;
-    long prevTime = System.currentTimeMillis();
-    long curTime;
     // Background clear color.
     window.setClearColor(0.0f, 1.0f, 0.0f, 0.0f);
     while (!GLFW.glfwWindowShouldClose(window.get())) {
@@ -89,10 +85,9 @@ public class Main {
         GLFW.glfwSetWindowShouldClose(window.get(), true);
       }
 
-      curTime = System.currentTimeMillis();
-      Vector3f v = moveHandler.calculateVelocity(camera.target(), 0.003f * (curTime - prevTime));
+      Game.INSTANCE.adjust();
+      Vector3f v = moveHandler.calculateVelocity(camera.target(), 0.003f * Game.INSTANCE.getAdjustment());
       camera.setVel(v.add(0, camera.vel().y, 0));
-      prevTime = curTime;
 
       //game.getInstances(trump.id()).get(0).setVel(new Vector3f(0.0002f, 0f, 0f));
       for (MapItemInstance instance : game.getAll()) {
@@ -126,12 +121,14 @@ public class Main {
       for (MapItem item : game.getItems()) {
         item.bind();
         GL33.glBindVertexArray(item.vao());
-        for (MapItemInstance instance : game.getInstances(item.id())) {
-          Matrix4f insMvp = new Matrix4f(mvp);
-          Matrix4f instanceMat = new Matrix4f().translate(instance.world()).mul(item.model());
-          insMvp.mul(instanceMat);
-          Shaders.RENDERER.setUniformMatrix("mvp", insMvp);
-          GL33.glDrawElements(GL33.GL_TRIANGLES, item.getIndices().length, GL33.GL_UNSIGNED_INT, 0);
+        if (item.vao() != 0) {
+          for (MapItemInstance instance : game.getInstances(item.id())) {
+            Matrix4f insMvp = new Matrix4f(mvp);
+            Matrix4f instanceMat = new Matrix4f().translate(instance.world()).mul(item.model());
+            insMvp.mul(instanceMat);
+            Shaders.RENDERER.setUniformMatrix("mvp", insMvp);
+            GL33.glDrawElements(GL33.GL_TRIANGLES, item.getIndices().length, GL33.GL_UNSIGNED_INT, 0);
+          }
         }
       }
 
