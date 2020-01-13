@@ -22,6 +22,8 @@ public class WindowResizeCallback implements GLFWFramebufferSizeCallbackI {
     this.window.setWidth(width);
     this.window.setHeight(height);
     GL33.glViewport(0, 0, width, height);
+    StaticDraw.setWidth(width);
+    StaticDraw.setHeight(height);
   }
 
 }

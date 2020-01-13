@@ -9,9 +9,10 @@ import org.lwjgl.system.MemoryUtil;
 
 public enum Sprite {
   
-  TRUMP("./res/trump.png"),
+  APPLE("./res/apple.png"),
   CAMERA(""),
-  WALL("./res/wall.png");
+  WALL("./res/wall.png"),
+  GRAPE("./res/grape.png");
 
   private final int handle;
   

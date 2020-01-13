@@ -2,8 +2,6 @@ import org.joml.Vector3f;
 
 public class Collision {
 
-  private static final float EPSILON = Float.MIN_VALUE;
-
   public static boolean collision(Vector3f posA, MapItem typeA, Vector3f posB, MapItem typeB) {
     Vector3f scaleA = new Vector3f();
     typeA.model().getScale(scaleA);

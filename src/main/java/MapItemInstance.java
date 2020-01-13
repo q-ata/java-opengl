@@ -3,18 +3,23 @@ import org.joml.Vector3f;
 public abstract class MapItemInstance {
 
   private Vector3f worldPos;
-
+  private int id;
   private Vector3f vel = new Vector3f();
-  private static final Vector3f GRAVITY = new Vector3f(0.0f, -0.0000002f, 0.0f);
+  private boolean[] collisionComponents = new boolean[3];
 
-  public MapItemInstance(Vector3f worldPos) {
+  private static final Vector3f GRAVITY = new Vector3f(0.0f, -0.008f, 0.0f);
+
+  public MapItemInstance(Vector3f worldPos, int id) {
     this.worldPos = worldPos;
+    this.id = id;
   }
 
   /**
    * How the instance should behave every frame.
    */
-  public abstract void behaviour();
+  public void behaviour() {
+
+  };
 
   /**
    * Sets this instance's velocity.
@@ -41,27 +46,28 @@ public abstract class MapItemInstance {
   }
 
   /**
-   * Adjust the location of this instance in world space. This method accounts for the difference between frames
-   * such that a constant amount will be moved regardless of computer speed.
+   * Adjust the location of this instance in world space.
    * @param amt The amount to move by.
    */
   public void move(Vector3f amt) {
-    worldPos.add(amt.mul(Game.INSTANCE.getAdjustment()));
+    worldPos.add(amt);
   }
 
   /**
    * Callback for when the game ticks forward.
    */
   public void onTick() {
-    worldPos.add(vel());
+    move(vel());
+    collisionComponents[0] = collisionComponents[1] = collisionComponents[2] = false;
   }
 
   /**
    * Callback for when this instance collides with another.
    * @param other The other instance.
    */
-  public void onCollision(MapItemInstance other) {
-    worldPos.add(vel().negate());
+  public boolean onCollision(MapItemInstance other) {
+    move(vel().negate());
+    return true;
   }
 
   /**
@@ -69,21 +75,40 @@ public abstract class MapItemInstance {
    * @param other The other instance.
    */
   public void onCollisionResolution(MapItemInstance other) {
-    Vector3f v = new Vector3f(vel().x, 0f, 0f);
-    worldPos.add(v);
-    if (Collision.collision(world(), Game.INSTANCE.retrieve(this), other.world(), Game.INSTANCE.retrieve(other))) {
-      worldPos.add(v.negate());
+    Vector3f vel = vel();
+    Vector3f v = new Vector3f(vel.x, 0f, 0f);
+    if (Collision.collision(world().add(v), Game.INSTANCE.retrieve(this), other.world(), Game.INSTANCE.retrieve(other))) {
+      vel.x = 0;
+      setVel(vel);
+      collisionComponents[0] = true;
     }
-    v = new Vector3f(0f, vel().y, 0f);
-    worldPos.add(v);
-    if (Collision.collision(world(), Game.INSTANCE.retrieve(this), other.world(), Game.INSTANCE.retrieve(other))) {
-      worldPos.add(v.negate());
+    else {
+      move(v);
+      collisionComponents[0] = false;
     }
-    v = new Vector3f(0f, 0f, vel().z);
-    worldPos.add(v);
-    if (Collision.collision(world(), Game.INSTANCE.retrieve(this), other.world(), Game.INSTANCE.retrieve(other))) {
-      worldPos.add(v.negate());
+    v.x = 0;
+    v.z = vel.z;
+    if (Collision.collision(world().add(v), Game.INSTANCE.retrieve(this), other.world(), Game.INSTANCE.retrieve(other))) {
+      vel.z = 0;
+      setVel(vel);
+      collisionComponents[2] = true;
     }
+    else {
+      move(v);
+      collisionComponents[2] = false;
+    }
+    vel.z = 0;
+    v.y = vel.y;
+    if (Collision.collision(world().add(v), Game.INSTANCE.retrieve(this), other.world(), Game.INSTANCE.retrieve(other))) {
+      vel.y = 0;
+      setVel(vel);
+      collisionComponents[1] = true;
+    }
+    else {
+      move(v);
+      collisionComponents[1] = false;
+    }
+
   }
 
   /**
@@ -91,6 +116,10 @@ public abstract class MapItemInstance {
    */
   public void onGravity() {
     setVel(vel().add(GRAVITY));
+  }
+
+  protected boolean getComponent(int c) {
+    return collisionComponents[c];
   }
 
 }

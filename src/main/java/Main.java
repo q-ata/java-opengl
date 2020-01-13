@@ -1,4 +1,5 @@
 import org.joml.Matrix4f;
+import org.joml.Vector2f;
 import org.joml.Vector3f;
 import org.lwjgl.glfw.Callbacks;
 import org.lwjgl.glfw.GLFW;
@@ -10,10 +11,13 @@ import org.lwjgl.opengl.GLCapabilities;
 public class Main {
 
   private void start() {
+
     GLFWErrorCallback.createPrint(System.err).set();
 
-    if (!GLFW.glfwInit())
-      throw new IllegalStateException("Unable to initialize GLFW");
+    if (!GLFW.glfwInit()) {
+      Logger.error(getClass(), "Failed to initialize GLFW.");
+      return;
+    }
 
     // Configure GLFW settings.
     GLFW.glfwDefaultWindowHints();
@@ -22,7 +26,7 @@ public class Main {
     GLFW.glfwWindowHint(GLFW.GLFW_RESIZABLE, GLFW.GLFW_TRUE);
 
     // Create a new window.
-    Window window = new Window(800, 600, "A window name.");
+    Window window = new Window(960, 540, "A window name.");
     GLFW.glfwMakeContextCurrent(window.get());
     GLCapabilities capabilities = GL.createCapabilities();
     if (!capabilities.OpenGL33) {
@@ -33,32 +37,29 @@ public class Main {
     GL33.glEnable(GL33.GL_DEPTH_TEST);
     
     // Enable v-sync.
-    // GLFW.glfwSwapInterval(1);
+    GLFW.glfwSwapInterval(1);
     // Show the window.
     GLFW.glfwShowWindow(window.get());
 
     GL33.glUniform1i(GL33.glGetUniformLocation(Shaders.RENDERER.get(), "texData"), 0);
 
     Game game = Game.INSTANCE;
-    DonaldTrump trump = new DonaldTrump();
+    Apple apple = new Apple();
     Camera cam = new Camera();
-    Game.INSTANCE.addItem(trump);
-    Game.INSTANCE.addInstance(new Vector3f(-8.0f, 0.0f, 0.0f), trump.id());
-    Game.INSTANCE.addInstance(new Vector3f(4f, 0.0f, 0.0f), trump.id());
+    Game.INSTANCE.addItem(apple);
+    Game.INSTANCE.addInstance(new Vector3f(14f, 2f, 10.0f), apple.id());
     Game.INSTANCE.addItem(cam);
-    Game.INSTANCE.addInstance(new Vector3f(4f, 0.0f, 2.0f), cam.id());
+    Game.INSTANCE.addInstance(new Vector3f(15f, 2f, 15f), cam.id());
 
     Wall wall = new Wall();
     Game.INSTANCE.addItem(wall);
-    Game.INSTANCE.addInstance(new Vector3f(1f, -1.1f, 0f), wall.id());
+    Game.INSTANCE.addInstance(new Vector3f(10f, 0f, 10f), wall.id());
+    Game.INSTANCE.addInstance(new Vector3f(20.1f, 0f, 10f), wall.id());
+    Game.INSTANCE.addInstance(new Vector3f(10f, 0f, 20.1f), wall.id());
+    Game.INSTANCE.addInstance(new Vector3f(20.1f, 0f, 20.1f), wall.id());
 
     CameraInstance camera = (CameraInstance) Game.INSTANCE.getInstances(cam.id()).get(0);
-    /*
-    Wall wall = new Wall();
-    wall.addInstance(new WallInstance(new Vector3f(0.5f, 0.0f, 0.0f)));
-    game.getItems().add(wall);
-    wall.setVao(game.genBinding(wall));
-    */
+
     int err;
     while((err = GL33.glGetError()) != GL33.GL_NO_ERROR) {
       System.out.println(err);
@@ -67,16 +68,18 @@ public class Main {
     KeyboardInputHandler keyHandler = new KeyboardInputHandler();
     GLFW.glfwSetKeyCallback(window.get(), keyHandler);
     PlayerMovementHandler moveHandler = new PlayerMovementHandler(keyHandler);
+    Game.INSTANCE.setKeyboardHandler(moveHandler);
     GLFW.glfwSetCursorPosCallback(window.get(), new MouseMovementHandler(camera));
+    MouseClickHandler mouseHandler = new MouseClickHandler();
+    GLFW.glfwSetMouseButtonCallback(window.get(), mouseHandler);
+    Game.INSTANCE.setClickHandler(mouseHandler);
     GLFW.glfwSetInputMode(window.get(), GLFW.GLFW_CURSOR, GLFW.GLFW_CURSOR_DISABLED);
 
+    FrameCounter fps = new FrameCounter();
     Matrix4f mvp = new Matrix4f();
     // TODO: Adjust projection matrix when window is resized.
-    Matrix4f proj = new Matrix4f().perspective((float) Math.toRadians(50.0f), (float) window.getWidth() / window.getHeight(), 0.1f, 100.0f);
+    Matrix4f proj = new Matrix4f().perspective((float) Math.toRadians(60.0f), (float) window.getWidth() / window.getHeight(), 0.05f, 200.0f);
 
-    int frames = 0;
-    long delta = System.currentTimeMillis();
-    long current;
     // Background clear color.
     window.setClearColor(0.0f, 1.0f, 0.0f, 0.0f);
     while (!GLFW.glfwWindowShouldClose(window.get())) {
@@ -85,27 +88,23 @@ public class Main {
         GLFW.glfwSetWindowShouldClose(window.get(), true);
       }
 
-      Game.INSTANCE.adjust();
-      Vector3f v = moveHandler.calculateVelocity(camera.target(), 0.003f * Game.INSTANCE.getAdjustment());
-      camera.setVel(v.add(0, camera.vel().y, 0));
-
-      //game.getInstances(trump.id()).get(0).setVel(new Vector3f(0.0002f, 0f, 0f));
-      for (MapItemInstance instance : game.getAll()) {
-        instance.onTick();
+      for (int i = 0; i < game.getAll().size(); i++) {
+        game.getAll().get(i).behaviour();
+      }
+      for (int i = 0; i < game.getAll().size(); i++) {
+        game.getAll().get(i).onTick();
       }
       for (int i = 0; i < game.getAll().size(); i++) {
         for (int j = i + 1; j < game.getAll().size(); j++) {
           MapItemInstance a = game.getAll().get(i);
           MapItemInstance b = game.getAll().get(j);
-          if (Collision.collision(a.world(), game.retrieve(a), b.world(), game.retrieve(b))) {
-            a.onCollision(b);
-            b.onCollision(a);
+          if (Collision.collision(a.world(), game.retrieve(a), b.world(), game.retrieve(b)) && a.onCollision(b) && b.onCollision(a)) {
             a.onCollisionResolution(b);
             b.onCollisionResolution(a);
           }
         }
-      }
 
+      }
       for (MapItemInstance instance : game.getAll()) {
         instance.onGravity();
       }
@@ -132,16 +131,17 @@ public class Main {
         }
       }
 
-      frames++;
-      if ((current = System.currentTimeMillis()) >= delta + 1000) {
-        System.out.println(frames + " FPS");
-        frames = 0;
-        delta = current;
-      }
+      StaticDraw.drawRect(0, 0, 0.6f * (camera.getHealth() / 100f), 0.1f, Colors.RED);
+      StaticDraw.drawRect(0, 0, 0.02f, 0.02f, Colors.BLACK, true);
+
       // Swap to other frame buffer.
       GLFW.glfwSwapBuffers(window.get());
       // Poll for window events and run callbacks.
       GLFW.glfwPollEvents();
+
+      if (fps.increment()) {
+        System.out.println(fps.get() + " FPS");
+      }
     }
 
     Callbacks.glfwFreeCallbacks(window.get());

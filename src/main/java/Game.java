@@ -12,12 +12,9 @@ public class Game {
   private Map<Class<? extends MapItemInstance>, Integer> mapping = new HashMap<>();
   private List<MapItemInstance> all = new ArrayList<>();
 
-  private long prevTime;
-  private long curTime;
-
-  public Game() {
-    prevTime = curTime = System.currentTimeMillis();
-  }
+  private PlayerMovementHandler keyHandler;
+  private MouseClickHandler clickHandler;
+  private CameraInstance player;
 
   /**
    * Create a VAO to represent all instances of the specified MapItem.
@@ -45,22 +42,6 @@ public class Game {
   }
 
   /**
-   * Update timestamps.
-   */
-  public void adjust() {
-    prevTime = curTime;
-    curTime = System.currentTimeMillis();
-  }
-
-  /**
-   * Get delta between frames.
-   * @return The difference.
-   */
-  public long getAdjustment() {
-    return curTime - prevTime;
-  }
-
-  /**
    * Register a new MapItem with the Game object.
    * @param instance The MapItem to register.
    */
@@ -76,10 +57,18 @@ public class Game {
    * @param pos The location of the instance in 3D world space.
    * @param id The unique identifer of the MapItem.
    */
-  public void addInstance(Vector3f pos, int id) {
-    MapItemInstance instance = items.get(id).create(pos);
+  public MapItemInstance addInstance(Vector3f pos, int id) {
+    MapItemInstance instance = items.get(id).create(pos, all.size());
+    if (instance instanceof CameraInstance) {
+      if (player != null) {
+        Logger.error(getClass(), "Tried to create player instance but one already exists.");
+        return null;
+      }
+      player = (CameraInstance) instance;
+    }
     all.add(instance);
     instances.get(items.get(id)).add(instance);
+    return instance;
   }
 
   /**
@@ -114,6 +103,32 @@ public class Game {
    */
   public List<MapItemInstance> getAll() {
     return Collections.unmodifiableList(all);
+  }
+
+  public void setKeyboardHandler(PlayerMovementHandler handler) {
+    if (keyHandler != null) {
+      Logger.error(getClass(), "Trying to set keyboard input handler when one already exists.");
+    }
+    keyHandler = handler;
+  }
+
+  public PlayerMovementHandler getKeyHandler() {
+    return keyHandler;
+  }
+
+  public void setClickHandler(MouseClickHandler handler) {
+    if (clickHandler != null) {
+      Logger.error(getClass(), "Trying to set mouse click handler when one already exists.");
+    }
+    clickHandler = handler;
+  }
+
+  public MouseClickHandler getClickHandler() {
+    return clickHandler;
+  }
+
+  public CameraInstance getPlayer() {
+    return player;
   }
 
 }

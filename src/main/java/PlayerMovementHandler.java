@@ -76,19 +76,23 @@ public class PlayerMovementHandler {
       }
     }
     if (right != 0) {
-      rl.add(target.cross(CameraInstance.UP));
+      rl.add(new Vector3f(target).cross(CameraInstance.UP));
       if (right == LEFT) {
         rl.negate();
       }
     }
     Vector3f empty =  new Vector3f();
-    if (fb.equals(empty, Constants.EPSILON) && rl.equals(empty, Constants.EPSILON)) {
+    if (fb.equals(empty, GameConstants.EPSILON) && rl.equals(empty, GameConstants.EPSILON)) {
       return empty;
     }
     fb.add(rl);
     fb.setComponent(1, 0);
     fb.normalize().mul(sensitivity);
     return fb;
+  }
+
+  public boolean isPressed(int k) {
+    return KeyboardInputHandler.KEYS[k];
   }
 
 }

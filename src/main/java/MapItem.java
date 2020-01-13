@@ -29,10 +29,10 @@ public abstract class MapItem {
    * @param pos The 3D world space coordinates of where this instance is located.
    * @return The instance.
    */
-  public MapItemInstance create(Vector3f pos) {
+  public MapItemInstance create(Vector3f pos, int id) {
     MapItemInstance item = null;
     try {
-      item = type.getConstructor(Vector3f.class).newInstance(pos);
+      item = type.getConstructor(Vector3f.class, int.class).newInstance(pos, id);
     }
     catch (NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException e) {
       Logger.error(getClass(), "Could not create map item instance.");
