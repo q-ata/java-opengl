@@ -58,7 +58,7 @@ public class Game {
    * @param id The unique identifer of the MapItem.
    */
   public MapItemInstance addInstance(Vector3f pos, int id) {
-    MapItemInstance instance = items.get(id).create(pos, all.size());
+    MapItemInstance instance = items.get(id).create(pos);
     if (instance instanceof CameraInstance) {
       if (player != null) {
         Logger.error(getClass(), "Tried to create player instance but one already exists.");
@@ -69,6 +69,14 @@ public class Game {
     all.add(instance);
     instances.get(items.get(id)).add(instance);
     return instance;
+  }
+
+  public void removeInstance(int id) {
+    all.remove(id);
+  }
+
+  public void cleanInstance(int id, int ind) {
+    instances.get(items.get(id)).remove(ind);
   }
 
   /**

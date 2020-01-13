@@ -13,15 +13,18 @@ public class CameraInstance extends MapItemInstance {
   private float prevX = 0.0f;
   private float prevY = 0.0f;
   private final float SENS = 0.05f;
-  private final float MOVE_SPEED = 0.05f;
+  private final float MOVE_SPEED = 0.06f;
+  private final float SPRINT_SPEED = 0.1f;
   private final float JUMP_HEIGHT = 0.22f;
 
   private Grape grape = new Grape();
   private int shootCdr = 0;
-  private int health = 100;
+  private int iframes = 0;
+  private int sprintMeter = 400;
+  private int sprintCdr = 30;
 
-  public CameraInstance(Vector3f worldPos, int id) {
-    super(worldPos, id);
+  public CameraInstance(Vector3f worldPos) {
+    super(worldPos);
     Game.INSTANCE.addItem(grape);
   }
 
@@ -69,7 +72,23 @@ public class CameraInstance extends MapItemInstance {
 
   @Override
   public void onTick() {
-    Vector3f v = Game.INSTANCE.getKeyHandler().calculateVelocity(target, MOVE_SPEED);
+    Vector3f v;
+    if (Game.INSTANCE.getKeyHandler().isPressed(GameConstants.ABILITY_1_KEY) && sprintMeter > 0) {
+      v = Game.INSTANCE.getKeyHandler().calculateVelocity(target, SPRINT_SPEED);
+      if (!v.equals(GameConstants.EMPTY, GameConstants.EPSILON)) {
+        sprintMeter -= 2;
+        sprintCdr = 45;
+      }
+    }
+    else {
+      v = Game.INSTANCE.getKeyHandler().calculateVelocity(target, MOVE_SPEED);
+      if (sprintCdr == 0 && sprintMeter < 400) {
+        sprintMeter++;
+      }
+      else if (sprintCdr != 0) {
+        sprintCdr--;
+      }
+    }
     if (Game.INSTANCE.getKeyHandler().isPressed(GameConstants.JUMP_KEY) && getComponent(1)) {
       v.add(0, JUMP_HEIGHT, 0);
     }
@@ -84,19 +103,23 @@ public class CameraInstance extends MapItemInstance {
     if (shootCdr != 0) {
       shootCdr--;
     }
+    if (iframes != 0) {
+      iframes--;
+    }
     super.onTick();
   }
 
-  public int getHealth() {
-    return health;
+  @Override
+  public boolean addHealth(int amt) {
+    if (iframes != 0) {
+      return false;
+    }
+    iframes = GameConstants.IFRAMES;
+    return super.addHealth(amt);
   }
 
-  public boolean addHealth(int amt) {
-    health -= amt;
-    if (health < 0) {
-      health = 0;
-    }
-    return health == 0;
+  public int getSprint() {
+    return sprintMeter;
   }
 
 }

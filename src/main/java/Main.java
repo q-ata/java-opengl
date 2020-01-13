@@ -1,5 +1,4 @@
 import org.joml.Matrix4f;
-import org.joml.Vector2f;
 import org.joml.Vector3f;
 import org.lwjgl.glfw.Callbacks;
 import org.lwjgl.glfw.GLFW;
@@ -7,6 +6,8 @@ import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.opengl.GL;
 import org.lwjgl.opengl.GL33;
 import org.lwjgl.opengl.GLCapabilities;
+
+import java.util.List;
 
 public class Main {
 
@@ -47,16 +48,17 @@ public class Main {
     Apple apple = new Apple();
     Camera cam = new Camera();
     Game.INSTANCE.addItem(apple);
-    Game.INSTANCE.addInstance(new Vector3f(14f, 2f, 10.0f), apple.id());
+    Game.INSTANCE.addInstance(new Vector3f(4f, 2f, 1f), apple.id());
     Game.INSTANCE.addItem(cam);
-    Game.INSTANCE.addInstance(new Vector3f(15f, 2f, 15f), cam.id());
+    Game.INSTANCE.addInstance(new Vector3f(5f, 2f, 5f), cam.id());
 
     Wall wall = new Wall();
     Game.INSTANCE.addItem(wall);
-    Game.INSTANCE.addInstance(new Vector3f(10f, 0f, 10f), wall.id());
-    Game.INSTANCE.addInstance(new Vector3f(20.1f, 0f, 10f), wall.id());
-    Game.INSTANCE.addInstance(new Vector3f(10f, 0f, 20.1f), wall.id());
-    Game.INSTANCE.addInstance(new Vector3f(20.1f, 0f, 20.1f), wall.id());
+    for (int i = -10; i < 20; i += 10) {
+      for (int j = -10; j < 20; j += 10) {
+        Game.INSTANCE.addInstance(new Vector3f(i, 0f, j), wall.id());
+      }
+    }
 
     CameraInstance camera = (CameraInstance) Game.INSTANCE.getInstances(cam.id()).get(0);
 
@@ -89,7 +91,17 @@ public class Main {
       }
 
       for (int i = 0; i < game.getAll().size(); i++) {
-        game.getAll().get(i).behaviour();
+        MapItemInstance is = game.getAll().get(i);
+        if (is.garbage()) {
+          game.removeInstance(i);
+        }
+        else {
+          Vector3f loc = is.world();
+          if (Math.abs(loc.x) > 500 || Math.abs(loc.y) > 500 || Math.abs(loc.z) > 500) {
+            is.mark();
+          }
+        }
+        is.behaviour();
       }
       for (int i = 0; i < game.getAll().size(); i++) {
         game.getAll().get(i).onTick();
@@ -121,7 +133,12 @@ public class Main {
         item.bind();
         GL33.glBindVertexArray(item.vao());
         if (item.vao() != 0) {
-          for (MapItemInstance instance : game.getInstances(item.id())) {
+          List<MapItemInstance> ins = game.getInstances(item.id());
+          for (int i = 0; i < ins.size(); i++) {
+            MapItemInstance instance = ins.get(i);
+            if (instance.garbage()) {
+              game.cleanInstance(item.id(), i);
+            }
             Matrix4f insMvp = new Matrix4f(mvp);
             Matrix4f instanceMat = new Matrix4f().translate(instance.world()).mul(item.model());
             insMvp.mul(instanceMat);
@@ -131,7 +148,8 @@ public class Main {
         }
       }
 
-      StaticDraw.drawRect(0, 0, 0.6f * (camera.getHealth() / 100f), 0.1f, Colors.RED);
+      StaticDraw.drawRect(0, 0f, 0.6f * (camera.getHealth() / 100f), 0.1f, Colors.RED);
+      StaticDraw.drawRect(0, 0.18f, 0.5f * (camera.getSprint() / 400f), 0.05f, Colors.BLUE);
       StaticDraw.drawRect(0, 0, 0.02f, 0.02f, Colors.BLACK, true);
 
       // Swap to other frame buffer.

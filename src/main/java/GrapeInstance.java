@@ -2,15 +2,17 @@ import org.joml.Vector3f;
 
 public class GrapeInstance extends MapItemInstance {
 
-  public GrapeInstance(Vector3f worldPos, int id) {
-    super(worldPos, id);
+  public GrapeInstance(Vector3f worldPos) {
+    super(worldPos);
   }
 
   @Override
   public boolean onCollision(MapItemInstance other) {
     if (!(other instanceof CameraInstance || other instanceof GrapeInstance)) {
-      // TODO: Delete instance from game.
-      return super.onCollision(other);
+      mark();
+      if (other.addHealth(-50)) {
+        other.mark();
+      }
     }
     return false;
   }

@@ -1,9 +1,9 @@
 import org.joml.Vector3f;
 
-public class WallInstance extends MapItemInstance {
+public class WallInstance extends ImmuneInstance {
 
-  public WallInstance(Vector3f worldPos, int id) {
-    super(worldPos, id);
+  public WallInstance(Vector3f worldPos) {
+    super(worldPos);
   }
 
   @Override
@@ -14,4 +14,5 @@ public class WallInstance extends MapItemInstance {
   public boolean onCollision(MapItemInstance other) {
     return !(other instanceof WallInstance);
   }
+
 }

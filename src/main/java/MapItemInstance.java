@@ -3,15 +3,15 @@ import org.joml.Vector3f;
 public abstract class MapItemInstance {
 
   private Vector3f worldPos;
-  private int id;
   private Vector3f vel = new Vector3f();
   private boolean[] collisionComponents = new boolean[3];
+  private int health = 100;
+  private boolean garbage = false;
 
   private static final Vector3f GRAVITY = new Vector3f(0.0f, -0.008f, 0.0f);
 
-  public MapItemInstance(Vector3f worldPos, int id) {
+  public MapItemInstance(Vector3f worldPos) {
     this.worldPos = worldPos;
-    this.id = id;
   }
 
   /**
@@ -120,6 +120,26 @@ public abstract class MapItemInstance {
 
   protected boolean getComponent(int c) {
     return collisionComponents[c];
+  }
+
+  public int getHealth() {
+    return health;
+  }
+
+  public boolean addHealth(int amt) {
+    health += amt;
+    if (health < 0) {
+      health = 0;
+    }
+    return health == 0;
+  }
+
+  public void mark() {
+    garbage = true;
+  }
+
+  public boolean garbage() {
+    return garbage;
   }
 
 }
