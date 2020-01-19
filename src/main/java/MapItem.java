@@ -21,7 +21,7 @@ public abstract class MapItem {
     model = transform.get();
     this.sprite = sprite;
     this.type = type;
-    setVao(Game.INSTANCE.genBinding(this));
+    setVao(Game.game().genBinding(this));
   }
 
   /**
@@ -91,6 +91,10 @@ public abstract class MapItem {
       return;
     }
     identifier = id;
+  }
+
+  public void reset() {
+    identifier = -1;
   }
 
   /**

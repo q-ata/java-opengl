@@ -26,7 +26,7 @@ public abstract class MapItemInstance {
    * @param vel The new velocity.
    */
   public void setVel(Vector3f vel) {
-      this.vel = vel;
+    this.vel = vel;
   }
 
   /**
@@ -76,19 +76,8 @@ public abstract class MapItemInstance {
    */
   public void onCollisionResolution(MapItemInstance other) {
     Vector3f vel = vel();
-    Vector3f v = new Vector3f(vel.x, 0f, 0f);
-    if (Collision.collision(world().add(v), Game.INSTANCE.retrieve(this), other.world(), Game.INSTANCE.retrieve(other))) {
-      vel.x = 0;
-      setVel(vel);
-      collisionComponents[0] = true;
-    }
-    else {
-      move(v);
-      collisionComponents[0] = false;
-    }
-    v.x = 0;
-    v.z = vel.z;
-    if (Collision.collision(world().add(v), Game.INSTANCE.retrieve(this), other.world(), Game.INSTANCE.retrieve(other))) {
+    Vector3f v = new Vector3f(0f, 0f, vel.z);
+    if (Collision.collision(world().add(v), Game.game().retrieve(this), other.world(), Game.game().retrieve(other))) {
       vel.z = 0;
       setVel(vel);
       collisionComponents[2] = true;
@@ -97,9 +86,19 @@ public abstract class MapItemInstance {
       move(v);
       collisionComponents[2] = false;
     }
-    vel.z = 0;
+    v.z = 0;
+    v.x = vel.x;
+    if (Collision.collision(world().add(v), Game.game().retrieve(this), other.world(), Game.game().retrieve(other))) {
+      vel.x = 0;
+      setVel(vel);
+      collisionComponents[0] = true;
+    }
+    else {
+      move(v);
+      collisionComponents[0] = false;
+    }
     v.y = vel.y;
-    if (Collision.collision(world().add(v), Game.INSTANCE.retrieve(this), other.world(), Game.INSTANCE.retrieve(other))) {
+    if (Collision.collision(world().add(v), Game.game().retrieve(this), other.world(), Game.game().retrieve(other))) {
       vel.y = 0;
       setVel(vel);
       collisionComponents[1] = true;
@@ -108,6 +107,7 @@ public abstract class MapItemInstance {
       move(v);
       collisionComponents[1] = false;
     }
+    vel.y = 0;
 
   }
 

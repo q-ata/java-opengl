@@ -1,0 +1,11 @@
+fov=70
+sensitivity=0.05
+minInt=120
+maxInt=300
+intCurve=0.95
+tryPeriod=60
+tryChance=0.5
+tryCurve=1.1
+stageInt=1200
+width=960
+height=540

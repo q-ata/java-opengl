@@ -10,7 +10,7 @@ public class GrapeInstance extends MapItemInstance {
   public boolean onCollision(MapItemInstance other) {
     if (!(other instanceof CameraInstance || other instanceof GrapeInstance)) {
       mark();
-      if (other.addHealth(-50)) {
+      if (other.addHealth(-25)) {
         other.mark();
       }
     }

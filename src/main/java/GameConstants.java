@@ -14,5 +14,11 @@ public class GameConstants {
   public static final float BULLET_SPEED = 0.4f;
   public static final float EPSILON = Float.MIN_VALUE;
   public static final Vector3f EMPTY = new Vector3f();
+  public static final String OPTIONS_PATH = "./res/options.txt";
+  public static final int WINDOW_WIDTH = 960;
+  public static final int WINDOW_HEIGHT = 540;
+
+  public static final MapItem[] ALL_ENEMIES = {new Apple(), new Squash(), new Pear()};
+  public static final GameEvent[] ALL_EVENTS = {new PhysicsHandler(), new RenderHandler(), new EnemySpawner(), new FrameCounter()};
 
 }

@@ -9,4 +9,5 @@ public abstract class ImmuneInstance extends MapItemInstance {
   public boolean addHealth(int amt) {
     return false;
   }
+
 }

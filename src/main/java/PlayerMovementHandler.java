@@ -6,7 +6,6 @@ public class PlayerMovementHandler {
   private static final int BACKWARD = 2;
   private static final int RIGHT = 1;
   private static final int LEFT = 2;
-  private int moving = 0;
   private int forward = 0;
   private int right = 0;
 

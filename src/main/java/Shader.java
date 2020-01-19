@@ -14,9 +14,11 @@ import org.lwjgl.opengl.GL33;
 /**
  * Represents a shader program with a vertex and fragment shader.
  */
-public class Shader extends Handle {
+public class Shader extends Handle implements Resettable {
 
   private static int currentHandle = -1;
+  private String vsPath;
+  private String fsPath;
   
   /**
    * Construct a shader program.
@@ -24,6 +26,11 @@ public class Shader extends Handle {
    * @param fsPath Path to fragment shader file.
    */
   public Shader(String vsPath, String fsPath) {
+    this.vsPath = vsPath;
+    this.fsPath = fsPath;
+  }
+
+  private void load() {
     // Attempt to load contents of the shader files.
     String vsSource = loadShaderSource(vsPath);
     if (vsSource == null)
@@ -59,7 +66,6 @@ public class Shader extends Handle {
     // Delete individual shaders.
     GL33.glDeleteShader(vs);
     GL33.glDeleteShader(fs);
-    
   }
   
   /**
@@ -115,6 +121,11 @@ public class Shader extends Handle {
       e.printStackTrace();
       return null;
     }
+  }
+
+  @Override
+  public void reset() {
+    load();
   }
 
 }

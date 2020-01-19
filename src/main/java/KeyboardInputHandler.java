@@ -33,7 +33,7 @@ public class KeyboardInputHandler implements GLFWKeyCallbackI {
 
   public void addCallback(int key, KeyPressCallback cb) {
     if (!cbs.containsKey(key)) {
-      cbs.put(key, new ArrayList<KeyPressCallback>());
+      cbs.put(key, new ArrayList<>());
     }
     cbs.get(key).add(cb);
   }

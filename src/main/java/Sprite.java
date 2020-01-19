@@ -7,16 +7,25 @@ import org.lwjgl.stb.STBImage;
 import org.lwjgl.system.MemoryStack;
 import org.lwjgl.system.MemoryUtil;
 
-public enum Sprite {
+public enum Sprite implements Resettable {
   
   APPLE("./res/apple.png"),
   CAMERA(""),
   WALL("./res/wall.png"),
-  GRAPE("./res/grape.png");
+  PINEAPPLE("./res/pineapple.png"),
+  GRAPE("./res/grape.png"),
+  SQUASH("./res/squash.png"),
+  PEAR("./res/pear.png");
 
-  private final int handle;
-  
+  private int handle;
+  private String source;
+
   private Sprite(String source) {
+    this.source = source;
+  }
+
+  @Override
+  public void reset() {
     if (source.equals("")) {
       handle = 0;
       return;
