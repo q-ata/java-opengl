@@ -9,7 +9,7 @@ public class CameraInstance extends MapItemInstance {
   private Vector3f target = new Vector3f();
 
   private final float MOVE_SPEED = 0.06f;
-  private final float SPRINT_SPEED = 0.1f;
+  private final float SPRINT_SPEED = 0.12f;
   private final float JUMP_HEIGHT = 0.22f;
 
   private Grape grape = new Grape();
@@ -48,9 +48,9 @@ public class CameraInstance extends MapItemInstance {
   @Override
   public void onTick() {
     Vector3f v;
-    if (Game.game().getKeyHandler().isPressed(GameConstants.ABILITY_1_KEY) && sprintMeter > 0) {
+    if (Game.game().getKeyHandler().isPressed(GameConfig.getAbility1()) && sprintMeter > 0) {
       v = Game.game().getKeyHandler().calculateVelocity(target, SPRINT_SPEED);
-      if (!v.equals(GameConstants.EMPTY, GameConstants.EPSILON)) {
+      if (!v.equals(GameConfig.EMPTY, GameConfig.EPSILON)) {
         sprintMeter -= 2;
         sprintCdr = 45;
       }
@@ -64,16 +64,16 @@ public class CameraInstance extends MapItemInstance {
         sprintCdr--;
       }
     }
-    if (Game.game().getKeyHandler().isPressed(GameConstants.JUMP_KEY) && getComponent(1)) {
+    if (Game.game().getKeyHandler().isPressed(GameConfig.getJumpKey()) && getComponent(1)) {
       v.add(0, JUMP_HEIGHT, 0);
     }
     setVel(v.add(0, vel().y, 0));
-    if (Game.game().getClickHandler().getMouseButton(GameConstants.LEFT_CLICK) && shootCdr == 0) {
+    if (Game.game().getClickHandler().getMouseButton(GameConfig.LEFT_CLICK) && shootCdr == 0) {
       Vector3f loc = world().add(0, 0.6f, 0);
       MapItemInstance grape = Game.game().addInstance(loc, this.grape.id());
-      Vector3f dir = new Vector3f(target).normalize().mul(GameConstants.BULLET_SPEED);
+      Vector3f dir = new Vector3f(target).normalize().mul(GameConfig.BULLET_SPEED);
       grape.setVel(dir);
-      shootCdr = GameConstants.SHOOT_COOLDOWN;
+      shootCdr = GameConfig.SHOOT_COOLDOWN;
     }
     if (shootCdr != 0) {
       shootCdr--;
@@ -89,7 +89,7 @@ public class CameraInstance extends MapItemInstance {
     if (iframes != 0) {
       return false;
     }
-    iframes = GameConstants.IFRAMES;
+    iframes = GameConfig.IFRAMES;
     return super.addHealth(amt);
   }
 

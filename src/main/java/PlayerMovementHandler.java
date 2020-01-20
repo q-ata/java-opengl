@@ -80,8 +80,8 @@ public class PlayerMovementHandler {
         rl.negate();
       }
     }
-    if (fb.equals(GameConstants.EMPTY, GameConstants.EPSILON) && rl.equals(GameConstants.EMPTY, GameConstants.EPSILON)) {
-      return new Vector3f(GameConstants.EMPTY);
+    if (fb.equals(GameConfig.EMPTY, GameConfig.EPSILON) && rl.equals(GameConfig.EMPTY, GameConfig.EPSILON)) {
+      return new Vector3f(GameConfig.EMPTY);
     }
     fb.add(rl);
     fb.setComponent(1, 0);

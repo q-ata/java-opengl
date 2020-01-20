@@ -1,11 +1,24 @@
+# Vertical field of view
 fov=70
+# Mouse sensitivity
 sensitivity=0.05
-minInt=120
-maxInt=300
+# Minimum interval between attempted enemy spawns
+minInt=180
+# Maximum interval between attempted enemy spawns
+maxInt=330
+# minInt and maxInt multiplier every stage
 intCurve=0.95
-tryPeriod=60
-tryChance=0.5
-tryCurve=1.1
+# Absolute minimum value of minInt, neither minInt or maxInt will decrease past this point
+maxIntReduction=60
+# Frames between increasing the stage
 stageInt=1200
+# Minimum space to player at which to spawn enemies
+spawnDist=9
+# Distance variance at which to spawn enemies
+spawnDistVariance=4
+# Enemy velocity multiplier increase every stage
+enemyVelIncrease=0.01
+# Window width
 width=960
+# Window height
 height=540

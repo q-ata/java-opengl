@@ -28,7 +28,12 @@ public class Options {
   }
 
   public float get(String name) {
-    return values.get(name);
+    Float f = values.get(name);
+    if (f == null) {
+      Logger.error(getClass(), "Failed to retrieve option value for " + name);
+      return -1;
+    }
+    return f;
   }
 
 }

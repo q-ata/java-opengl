@@ -17,7 +17,7 @@ public class PearInstance extends EnemyInstance {
   public void behaviour() {
 
     Vector3f target = Game.game().getPlayer().world();
-    Vector3f vel = target.sub(world()).normalize().mul(SPEED * GameConstants.SPEED_MULTIPLIER);
+    Vector3f vel = target.sub(world()).normalize().mul(SPEED * GameConfig.getSpeedMulti());
     Vector3f modded = new Vector3f(vel.x, vel().y, vel.z);
 
     if (toDash-- > 0) {

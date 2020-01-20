@@ -4,23 +4,23 @@ import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 
-public class MainMenu extends JFrame {
+public class MainMenu extends JFrame implements Menu {
 
   private static class MenuContent extends JPanel {
     private static final Image BG = genBackground();
     public MenuContent() {
-      setPreferredSize(new Dimension(GameConstants.WINDOW_WIDTH, GameConstants.WINDOW_HEIGHT));
+      setPreferredSize(new Dimension(GameConfig.MENU_WIDTH, GameConfig.MENU_HEIGHT));
       setLayout(null);
 
       JButton play = new JButton("PLAY");
       play.setBounds(185, 200, 140, 80);
       play.setFont(new Font("Comic Sans MS", Font.PLAIN, 32));
       play.addActionListener((ev) -> {
-        Thread th = new Thread(() -> {
+        new Thread(() -> {
           Game.reset();
           Game.game().start();
-        });
-        th.start();
+          new ScoreDisplay(Game.game().getScore()).start();
+        }).start();
       });
       add(play);
 
@@ -37,7 +37,12 @@ public class MainMenu extends JFrame {
       JButton scores = new JButton("Highscores");
       scores.setBounds(635, 200, 140, 80);
       scores.setFont(new Font("Comic Sans MS", Font.PLAIN, 20));
+      scores.addActionListener((ev) -> {
+        Highscores hs = new Highscores();
+        hs.start();
+      });
       add(scores);
+
     }
     private static Image genBackground() {
       try {
@@ -55,8 +60,7 @@ public class MainMenu extends JFrame {
     }
   }
 
-  public MainMenu() {
-
+  public void start() {
     setTitle("Veggietales 2");
     setResizable(false);
     setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
@@ -66,7 +70,6 @@ public class MainMenu extends JFrame {
     Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
     setLocation(dim.width / 2 - getSize().width / 2, dim.height / 2 - getSize().height / 2);
     setVisible(true);
-
   }
 
 }

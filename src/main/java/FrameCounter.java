@@ -18,7 +18,7 @@ public class FrameCounter implements GameEvent {
       lastSecond = System.currentTimeMillis();
       fps = frames;
       frames = 0;
-      System.out.println(fps + " FPS");
+      Logger.debug(getClass(), fps + " FPS ");
     }
 
   }

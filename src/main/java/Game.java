@@ -24,6 +24,7 @@ public class Game {
   private Map<MapItem, List<MapItemInstance>> instances = new HashMap<>();
   private Map<Class<? extends MapItemInstance>, Integer> mapping = new HashMap<>();
   private List<MapItemInstance> all = new ArrayList<>();
+  private int score = 0;
 
   private PlayerMovementHandler keyHandler;
   private MouseMovementHandler mouseHandler;
@@ -42,10 +43,9 @@ public class Game {
     game.addItem(cam);
     game.addInstance(new Vector3f(5f, 2f, 5f), cam.id());
 
-    for (MapItem i : GameConstants.ALL_ENEMIES) {
-      i.reset();
-      game.addItem(i);
-    }
+    GameConfig.ALL_ENEMIES[0] = new Apple();
+    GameConfig.ALL_ENEMIES[1] = new Squash();
+    GameConfig.ALL_ENEMIES[2] = new Pear();
 
     int err;
     while((err = GL33.glGetError()) != GL33.GL_NO_ERROR) {
@@ -53,7 +53,7 @@ public class Game {
     }
 
     Arrays.fill(KeyboardInputHandler.KEYS, false);
-    for (GameEvent ev : GameConstants.ALL_EVENTS) {
+    for (GameEvent ev : GameConfig.ALL_EVENTS) {
       ev.reset();
     }
     StaticDraw.reset();
@@ -69,11 +69,11 @@ public class Game {
 
       window.clear();
 
-      if (KeyboardInputHandler.KEYS[256]) {
+      if (KeyboardInputHandler.KEYS[256] || getPlayer().getHealth() <= 0) {
         GLFW.glfwSetWindowShouldClose(window.get(), true);
       }
 
-      for (GameEvent ev : GameConstants.ALL_EVENTS) {
+      for (GameEvent ev : GameConfig.ALL_EVENTS) {
         ev.run(game);
       }
 
@@ -101,7 +101,7 @@ public class Game {
     if (options != null) {
       return;
     }
-    options = new Options(GameConstants.OPTIONS_PATH);
+    options = new Options(GameConfig.OPTIONS_PATH);
   }
 
   public Window initOpenGL() {
@@ -119,7 +119,7 @@ public class Game {
     GLFW.glfwWindowHint(GLFW.GLFW_RESIZABLE, GLFW.GLFW_TRUE);
 
     // Create a new window.
-    Window window = new Window(GameConstants.WINDOW_WIDTH, GameConstants.WINDOW_HEIGHT, "A window name.");
+    Window window = new Window((int) Game.game().getOption("width"), (int) Game.game().getOption("height"), "A window name.");
     GLFW.glfwMakeContextCurrent(window.get());
     GLCapabilities capabilities = GL.createCapabilities();
     if (!capabilities.OpenGL33) {
@@ -288,6 +288,14 @@ public class Game {
 
   public float getOption(String name) {
     return options.get(name);
+  }
+
+  public int getScore() {
+    return score;
+  }
+
+  public void addScore(int amt) {
+    score += amt;
   }
 
 }

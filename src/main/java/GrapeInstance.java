@@ -12,6 +12,7 @@ public class GrapeInstance extends MapItemInstance {
       mark();
       if (other.addHealth(-25)) {
         other.mark();
+        Game.game().addScore(100);
       }
     }
     return false;

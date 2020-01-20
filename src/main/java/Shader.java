@@ -16,7 +16,6 @@ import org.lwjgl.opengl.GL33;
  */
 public class Shader extends Handle implements Resettable {
 
-  private static int currentHandle = -1;
   private String vsPath;
   private String fsPath;
   
@@ -33,11 +32,13 @@ public class Shader extends Handle implements Resettable {
   private void load() {
     // Attempt to load contents of the shader files.
     String vsSource = loadShaderSource(vsPath);
-    if (vsSource == null)
+    if (vsSource == null) {
       Logger.error(getClass(), "Could not find source file for vertex shader: " + vsPath);
+    }
     String fsSource = loadShaderSource(fsPath);
-    if (fsSource == null)
+    if (fsSource == null) {
       Logger.error(getClass(), "Could not find source file for fragment shader: " + fsPath);
+    }
     // Attempt to compile the vertex shader.
     int vs = GL33.glCreateShader(GL33.GL_VERTEX_SHADER);
     GL33.glShaderSource(vs, vsSource);
@@ -72,9 +73,7 @@ public class Shader extends Handle implements Resettable {
    * Bind this shader for use.
    */
   public void use() {
-    if (currentHandle != handle) {
-      GL33.glUseProgram(handle);
-    }
+    GL33.glUseProgram(handle);
   }
   
   public void setUniformMatrix(String name, Matrix4f mat) {

@@ -93,10 +93,6 @@ public abstract class MapItem {
     identifier = id;
   }
 
-  public void reset() {
-    identifier = -1;
-  }
-
   /**
    * Get the unique identifier for this MapItem.
    * @return The ID.

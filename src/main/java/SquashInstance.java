@@ -17,7 +17,7 @@ public class SquashInstance extends EnemyInstance {
   public void behaviour() {
     Vector3f target = Game.game().getPlayer().world();
     Vector3f targ2 = new Vector3f(target);
-    Vector3f vel = target.sub(world()).normalize().mul(SPEED * GameConstants.SPEED_MULTIPLIER);
+    Vector3f vel = target.sub(world()).normalize().mul(SPEED * GameConfig.getSpeedMulti());
     Vector3f cur = vel();
     setVel(new Vector3f(vel.x, cur.y, vel.z));
     if (getComponent(1) && targ2.sub(world()).length() < 3f && Math.random() < 0.1f && prevJump <= 0) {
