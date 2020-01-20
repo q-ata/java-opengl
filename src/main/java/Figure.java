@@ -86,11 +86,19 @@ public enum Figure {
     this.vertices = vertices;
     this.indices = indices;
   }
-  
+
+  /**
+   * Get list of vertices.
+   * @return The vertices.
+   */
   public float[] getVertices() {
     return vertices;
   }
-  
+
+  /**
+   * Get list of vertex indices.
+   * @return The indices.
+   */
   public int[] getIndices() {
     return indices;
   }

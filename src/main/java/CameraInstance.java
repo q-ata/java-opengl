@@ -24,7 +24,7 @@ public class CameraInstance extends MapItemInstance {
   }
 
   /**
-   * Constructs a view matrix.
+   * Constructs a view matrix. Dynamic view camera created with help from https://learnopengl.com/Getting-started/Camera
    * @return The view matrix.
    */
   public Matrix4f constructView() {

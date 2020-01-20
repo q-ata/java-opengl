@@ -5,6 +5,10 @@ public class Options {
 
   private Map<String, Float> values = new HashMap<>();
 
+  /**
+   * Create new options from file path.
+   * @param optionsPath The options path.
+   */
   public Options(String optionsPath) {
     DataFileReader reader = new DataFileReader(optionsPath);
     String line;
@@ -13,6 +17,7 @@ public class Options {
       String name = "";
       String value = "";
       try {
+        // Assign float value for each option.
         name = line.substring(0, pos);
         value = line.substring(pos + 1);
         float val = Float.parseFloat(value);
@@ -27,6 +32,11 @@ public class Options {
     values.put("ar", values.get("width") / values.get("height"));
   }
 
+  /**
+   * Get value of an option.
+   * @param name The option name.
+   * @return The value.
+   */
   public float get(String name) {
     Float f = values.get(name);
     if (f == null) {

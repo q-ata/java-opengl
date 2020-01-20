@@ -7,6 +7,9 @@ import org.joml.Vector3f;
 import org.joml.Vector4f;
 import org.lwjgl.opengl.GL33;
 
+/**
+ * Carries metadata for all associated instances.
+ */
 public abstract class MapItem {
   
   private Figure shape;
@@ -16,6 +19,13 @@ public abstract class MapItem {
   private int identifier = -1;
   private Class<? extends MapItemInstance> type;
 
+  /**
+   * Create a new MapItem.
+   * @param shape The model.
+   * @param transform The transformation on the model.
+   * @param sprite The model's sprite.
+   * @param type The MapItemInstance this represents.
+   */
   public MapItem(Figure shape, Transformation transform, Sprite sprite, Class<? extends MapItemInstance> type) {
     this.shape = shape;
     model = transform.get();
@@ -65,14 +75,26 @@ public abstract class MapItem {
     GL33.glBindTexture(GL33.GL_TEXTURE_2D, sprite.get());
   }
 
+  /**
+   * Transformation to apply to model.
+   * @return The transform.
+   */
   public Matrix4f model() {
     return new Matrix4f(model);
   }
 
+  /**
+   * The unique identifier for this item's VAO.
+   * @return The vao ID.
+   */
   public int vao() {
     return vao;
   }
 
+  /**
+   * Set this item's VAO. Can only be done once.
+   * @param vao The vao to set to.
+   */
   protected void setVao(int vao) {
     if (this.vao != 0) {
       Logger.error(getClass(), "VAO already bound with ID: " + vao);
@@ -101,6 +123,10 @@ public abstract class MapItem {
     return identifier;
   }
 
+  /**
+   * Get the MapItemInstance for this MapItem.
+   * @return The instance class.
+   */
   public Class<? extends MapItemInstance> getType() {
     return type;
   }

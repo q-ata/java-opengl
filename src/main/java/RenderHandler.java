@@ -11,6 +11,7 @@ public class RenderHandler implements GameEvent {
 
   @Override
   public void reset() {
+    // Reset MVP matrices.
     proj = new Matrix4f().perspective((float) Math.toRadians(Game.game().getOption("fov")), Game.game().getOption("ar"), 0.05f, 200.0f);
     mvp.identity();
   }
@@ -26,6 +27,9 @@ public class RenderHandler implements GameEvent {
 
     Shaders.RENDERER.use();
     for (MapItem item : game.getItems()) {
+      if (item instanceof Camera) {
+        continue;
+      }
       item.bind();
       GL33.glBindVertexArray(item.vao());
       if (item.vao() != 0) {

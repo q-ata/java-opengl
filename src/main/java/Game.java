@@ -53,12 +53,15 @@ public class Game {
 
     Camera cam = new Camera();
     game.addItem(cam);
-    game.addInstance(new Vector3f(5f, 2f, 5f), cam.id());
+    game.addInstance(new Vector3f(0f, 2f, 0f), cam.id());
 
     // Load enemy MapItems.
     GameConfig.ALL_ENEMIES[0] = new Apple();
     GameConfig.ALL_ENEMIES[1] = new Squash();
     GameConfig.ALL_ENEMIES[2] = new Pear();
+    for (MapItem item : GameConfig.ALL_ENEMIES) {
+      game.addItem(item);
+    }
 
     int err;
     while((err = GL33.glGetError()) != GL33.GL_NO_ERROR) {
@@ -144,7 +147,7 @@ public class Game {
     GLFW.glfwWindowHint(GLFW.GLFW_RESIZABLE, GLFW.GLFW_TRUE);
 
     // Create a new window.
-    Window window = new Window((int) Game.game().getOption("width"), (int) Game.game().getOption("height"), "A window name.");
+    Window window = new Window((int) Game.game().getOption("width"), (int) Game.game().getOption("height"), "Veggietales 2");
     GLFW.glfwMakeContextCurrent(window.get());
     GLCapabilities capabilities = GL.createCapabilities();
     if (!capabilities.OpenGL33) {
