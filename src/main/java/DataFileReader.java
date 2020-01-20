@@ -7,6 +7,10 @@ public class DataFileReader {
 
   private BufferedReader in;
 
+  /**
+   * Create a new file reader with given path.
+   * @param path Path to file to read.
+   */
   public DataFileReader(String path) {
     try {
       in = new BufferedReader(new FileReader(path));
@@ -17,6 +21,10 @@ public class DataFileReader {
     }
   }
 
+  /**
+   * Read a line of information from file.
+   * @return The line.
+   */
   public String readLine() {
     try {
       // Skip lines until it reaches one that is not a comment.
@@ -36,6 +44,9 @@ public class DataFileReader {
     }
   }
 
+  /**
+   * Close the reader.
+   */
   public void close() {
     try {
       in.close();

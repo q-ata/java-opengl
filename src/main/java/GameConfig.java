@@ -48,6 +48,10 @@ public class GameConfig {
     return "(" + df.format(vec.x) + ", " + df.format(vec.y) + ", " + df.format(vec.z) + ")";
   }
 
+  /**
+   * Get list of top 5 scores.
+   * @return List of scores in descending order.
+   */
   public static int[] getScores() {
     int[] top = new int[5];
     try {

@@ -13,12 +13,13 @@ public class FrameCounter implements GameEvent {
   @Override
   public void run(Game game) {
 
+    // Print FPS every second.
     frames++;
     if (System.currentTimeMillis() - lastSecond >= 1000) {
       lastSecond = System.currentTimeMillis();
       fps = frames;
       frames = 0;
-      Logger.debug(getClass(), fps + " FPS ");
+      Logger.debug(getClass(), fps + " FPS");
     }
 
   }

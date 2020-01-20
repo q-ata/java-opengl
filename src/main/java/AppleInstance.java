@@ -10,6 +10,7 @@ public class AppleInstance extends EnemyInstance {
 
   @Override
   public void behaviour() {
+    // Slowly approach the player in a straight line.
     Vector3f target = Game.game().getPlayer().world();
     Vector3f vel = target.sub(world()).normalize().mul(SPEED * GameConfig.getSpeedMulti());
     Vector3f cur = vel();

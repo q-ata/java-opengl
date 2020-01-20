@@ -12,9 +12,11 @@ public abstract class EnemyInstance extends MapItemInstance {
 
   @Override
   public boolean onCollision(MapItemInstance other) {
+    // Deal damage to player.
     if (other instanceof CameraInstance) {
       other.addHealth(-damage);
     }
+    // Do not collide with other enemies.
     if (other instanceof EnemyInstance) {
       return false;
     }

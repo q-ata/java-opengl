@@ -2,6 +2,9 @@ import java.nio.IntBuffer;
 
 import org.lwjgl.BufferUtils;
 
+/**
+ * Contains coordinate information for every drawable figure.
+ */
 public enum Figure {
 
   TRIANGLE(new float[] {
@@ -72,7 +75,13 @@ public enum Figure {
   
   private final float[] vertices;
   private final int[] indices;
-  
+
+  /**
+   * Create new figure using vertices and indices array. This method of representing models is inspired by https://ahbejarano.gitbook.io/lwjglgamedev/chapter5
+   * @param vertices Array of vertices representing the figure. Each coordinate has 5 components, x y z t_x t_y.
+   *                 x y z represents the position of the point in local space. t_x and t_y represent the coordinates in the texture where this point should be.
+   * @param indices Array of indices representing the order of which to draw the vertices coordinates.
+   */
   private Figure(float[] vertices, int[] indices) {
     this.vertices = vertices;
     this.indices = indices;

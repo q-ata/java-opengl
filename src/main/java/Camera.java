@@ -7,8 +7,4 @@ public class Camera extends MapItem {
     super(Figure.CUBE, Transformation.CAMERA, Sprite.CAMERA, CameraInstance.class);
   }
 
-  @Override
-  protected void setVao(int vao) {
-  }
-
 }

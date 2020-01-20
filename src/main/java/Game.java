@@ -10,28 +10,40 @@ import java.util.*;
 
 public class Game {
 
+  // Singleton static Game instance.
   private static Game instance;
 
   public static Game game() {
     return instance;
   }
 
+  // Reset the game.
   public static void reset() {
     instance = new Game();
   }
 
+  // List of all MapItems.
   private List<MapItem> items = new ArrayList<>();
+  // Map MapItem to list of its instances.
   private Map<MapItem, List<MapItemInstance>> instances = new HashMap<>();
+  // Map instance to its unique identifier.
   private Map<Class<? extends MapItemInstance>, Integer> mapping = new HashMap<>();
+  // All drawable instances.
   private List<MapItemInstance> all = new ArrayList<>();
+  // Player score.
   private int score = 0;
 
+  // Input handlers.
   private PlayerMovementHandler keyHandler;
   private MouseMovementHandler mouseHandler;
   private MouseClickHandler clickHandler;
+
   private CameraInstance player;
   private Options options;
 
+  /**
+   * Start the game.
+   */
   public void start() {
 
     Game game = game();
@@ -43,6 +55,7 @@ public class Game {
     game.addItem(cam);
     game.addInstance(new Vector3f(5f, 2f, 5f), cam.id());
 
+    // Load enemy MapItems.
     GameConfig.ALL_ENEMIES[0] = new Apple();
     GameConfig.ALL_ENEMIES[1] = new Squash();
     GameConfig.ALL_ENEMIES[2] = new Pear();
@@ -53,12 +66,15 @@ public class Game {
     }
 
     Arrays.fill(KeyboardInputHandler.KEYS, false);
+    // Reset GameEvents.
     for (GameEvent ev : GameConfig.ALL_EVENTS) {
       ev.reset();
     }
+    // Reset shaders.
     StaticDraw.reset();
     Shaders.RENDERER.reset();
     Shaders.QUAD_RENDERER.reset();
+    // Reset sprites.
     for (Sprite s : Sprite.values()) {
       s.reset();
     }
@@ -69,10 +85,12 @@ public class Game {
 
       window.clear();
 
+      // Check if game should end.
       if (KeyboardInputHandler.KEYS[256] || getPlayer().getHealth() <= 0) {
         GLFW.glfwSetWindowShouldClose(window.get(), true);
       }
 
+      // Run all GameEvents.
       for (GameEvent ev : GameConfig.ALL_EVENTS) {
         ev.run(game);
       }
@@ -97,6 +115,9 @@ public class Game {
     }
   }
 
+  /**
+   * Load options.
+   */
   public void loadOptions() {
     if (options != null) {
       return;
@@ -104,6 +125,10 @@ public class Game {
     options = new Options(GameConfig.OPTIONS_PATH);
   }
 
+  /**
+   * Prepare LWJGL and GLFW.
+   * @return
+   */
   public Window initOpenGL() {
     GLFWErrorCallback.createPrint(System.err).set();
 
@@ -148,14 +173,19 @@ public class Game {
     return window;
   }
 
+  /**
+   * Construct the immutable MapItems that form the playable map.
+   */
   public void constructMap() {
     Wall wall = new Wall();
     addItem(wall);
+    // Create the floor.
     for (int i = -20; i < 30; i += 10) {
       for (int j = -20; j < 30; j += 10) {
         addInstance(new Vector3f(i, -5f, j), wall.id());
       }
     }
+    // Create each side of the wall.
     for (int i = -20; i < 30; i += 10) {
       addInstance(new Vector3f(i, 5f, -20f), wall.id());
     }
@@ -168,25 +198,39 @@ public class Game {
     for (int i = -20; i < 30; i += 10) {
       addInstance(new Vector3f(20f, 5f, i), wall.id());
     }
+    // Easter egg :)
     PineappleEasterEgg perry = new PineappleEasterEgg();
     addItem(perry);
     addInstance(new Vector3f(20f, 2f, 10f), perry.id());
   }
 
   /**
-   * Create a VAO to represent all instances of the specified MapItem.
+   * Create a VAO to represent all instances of the specified MapItem. A Vertex Array Object stores all the calls needed to render a model.
+   * Basic LWJGL rendering from https://learnopengl.com/Getting-started/Hello-Triangle
    * @param item The MapItem to generate a VAO for.
    * @return The handle to the VAO.
    */
   public int genBinding(MapItem item) {
     int vao = GL33.glGenVertexArrays();
     GL33.glBindVertexArray(vao);
+    // Vertex buffer object contains the coordinate information for the model.
     int vbo  = GL33.glGenBuffers();
+    // Vertex buffer object indices information.
     int vboi = GL33.glGenBuffers();
+    // Add the model's vertices to VBO.
     GL33.glBindBuffer(GL33.GL_ARRAY_BUFFER, vbo);
     GL33.glBufferData(GL33.GL_ARRAY_BUFFER, item.getVertices(), GL33.GL_STATIC_DRAW);
+    // Add the model's vertex indices to VAO.
     GL33.glBindBuffer(GL33.GL_ELEMENT_ARRAY_BUFFER, vboi);
     GL33.glBufferData(GL33.GL_ELEMENT_ARRAY_BUFFER, item.getIndices(), GL33.GL_STATIC_DRAW);
+    /*
+    The index argument represents the attribute index in shader.
+    The size argument is the number of components in each vector.
+    The third argument is the type of component values.
+    The fourth argument is whether to normalize the vector.
+    The stride is how many bytes to move before encountering the start of the next vector.
+    The pointer is the offset from the start of the vector to locate this index's information.
+     */
     GL33.glVertexAttribPointer(0, 3, GL33.GL_FLOAT, false, 20, 0);
     GL33.glEnableVertexAttribArray(0);
     GL33.glVertexAttribPointer(1, 2, GL33.GL_FLOAT, false, 20, 12);
@@ -205,6 +249,7 @@ public class Game {
   public void addItem(MapItem instance) {
     items.add(instance);
     instances.put(instance, new ArrayList<>());
+    // Assign unique ID to this MapItem.
     instance.setIdentifier(items.size() - 1);
     mapping.put(instance.getType(), instance.id());
   }
@@ -270,30 +315,59 @@ public class Game {
     return Collections.unmodifiableList(all);
   }
 
+  /**
+   * Get keyboard input handler.
+   * @return The handler.
+   */
   public PlayerMovementHandler getKeyHandler() {
     return keyHandler;
   }
 
+  /**
+   * Get mouse movement handler.
+   * @return The handler.
+   */
   public MouseMovementHandler getMouseHandler() {
     return mouseHandler;
   }
 
+  /**
+   * Get mouse button handler.
+   * @return The handler.
+   */
   public MouseClickHandler getClickHandler() {
     return clickHandler;
   }
 
+  /**
+   * Get player.
+   * @return The player.
+   */
   public CameraInstance getPlayer() {
     return player;
   }
 
+  /**
+   * Get value of specific option.
+   * @param name Name of option.
+   * @return The value.
+   */
   public float getOption(String name) {
     return options.get(name);
   }
 
+  /**
+   * Get current score.
+   * @return The score.
+   */
   public int getScore() {
     return score;
   }
 
+  /**
+   * Increase current score.
+   * @param amt Amount to increase.
+   */
   public void addScore(int amt) {
     score += amt;
   }
