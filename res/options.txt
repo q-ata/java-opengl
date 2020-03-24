@@ -1,3 +1,4 @@
+# Lines that start with # are ignored. Change the value after the = sign.
 # Vertical field of view
 fov=70
 # Mouse sensitivity
@@ -18,7 +19,7 @@ spawnDist=9
 spawnDistVariance=4
 # Enemy velocity multiplier increase every stage
 enemyVelIncrease=0.01
-# Window width
+# structs.Window width
 width=960
-# Window height
+# structs.Window height
 height=540
